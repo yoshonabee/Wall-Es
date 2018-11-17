@@ -3,31 +3,47 @@ Module Agent
 """
 
 import math
-import map
+from maps import State
 
 
 class Agent:
-    def __init__(self, x, y, h, w, godmap):
-        self.x = 0
-        self.y = 0
-        self.radius = 10
-        self.velocity = 1
-        self.breakTime = 0
-        # Store self information on map
-        self.map = map.AgentMap(h, w)
-        # Use the god map to simulate discovering the unknown area
-        self.godmap = godmap
+    def __init__(self, id, x, y, h, w, r=20, v=1, b=0):
+        self.id = id
+        self.x = x
+        self.y = y
+        self.height = h
+        self.width = w
+        self.radius = r
+        self.velocity = v
+        self.breakTime = b
 
-    def move(self, dis):
-        self.x += dis.x
-        self.y += dis.y
+    def move(self, dx, dy):
+        x = self.x + dx
+        y = self.y + dy
+        if x > 0 and x < self.width:
+            self.x = x
+        if y > 0 and y < self.height:
+            self.y = y
 
-    def observe(self):
+    """
+    Use GodMap to get the area data in which the agent is observing.
+    """
+
+    def observe(self, godmap):
         areas = []
-        for h in self.map.height:
-            for w in self.map.width:
+        newTargets = []
+        newObstacles = []
+        # search area in agent's vision
+        for h in range(0, godmap.height):
+            for w in range(0, godmap.width):
                 if math.sqrt(((self.x - w) * (self.x - w) +
                               (self.y - h) * (self.y - h)) < self.radius):
                     areas.append({"x": w, "y": h})
+        # ask god to simulate observing
         for area in areas:
-            self.map.areas[area.x][area.y] = self.godmap.answerArea(area)
+            state = godmap.answerArea(area)
+            if(state is State["target"]):
+                newTargets.append(area)
+            elif(state is State["obstacle"]):
+                newObstacles.append(area)
+        return (newTargets, newObstacles)
