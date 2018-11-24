@@ -1,5 +1,5 @@
 """
-Module Map
+Module BaseMap
 """
 
 import random
@@ -8,7 +8,8 @@ import random
 State enum. Robots are added at run time.
 """
 State = {
-    "empty": 0,
+    "emptyWhite": -3,
+    "emptyGray": -4,
     "obstacle": -1,
     "target": -2,
     # "id1": id1,
@@ -21,11 +22,11 @@ The map of the game.
 """
 
 
-class Map:
+class BaseMap():
     def __init__(self, height, width):
         self.height = height
         self.width = width
-        self.areas = [[State["empty"]
+        self.areas = [[State["emptyWhite"]
                        for x in range(self.width)] for y in range(self.height)]
         self.targets = []
         self.obstacles = []
@@ -41,7 +42,7 @@ God's map. God know every thing.
 """
 
 
-class GodMap(Map):
+class GodMap(BaseMap):
 
     def setObstacles(self, obstacles):
         self.obstacles = obstacles
@@ -72,14 +73,13 @@ class GodMap(Map):
             self.areas[target["x"]][target["y"]] = State["target"]
 
 
-
 """
 The map for console. Collect information from all agents and give information
 back to them.
 """
 
 
-class ConsoleMap(Map):
+class ConsoleMap(BaseMap):
 
     def setAgents(self, agents):
         self.agents = agents
@@ -89,33 +89,37 @@ class ConsoleMap(Map):
 
     # update all agents position
     def updateAgents(self, agents):
-        # clear origin
-        for id in self.agents:
-            agent = self.agents[id]
-            self.areas[agent.x][agent.y] = State["empty"]
-        # set new
         self.agents = agents
         for id in agents:
             agent = self.agents[id]
             self.areas[agent.x][agent.y] = agent.id
+            area = {"x": agent.x, "y": agent.y}
+            if area in self.targets:
+                print("find")
+                self.targets.remove(area)
 
     # update a agent's position
     def updateAgent(self, agent):
-        oldAgent = self.agents[agent.id]
-        # clear origin
-        self.areas[oldAgent.x][oldAgent.y] = State["empty"]
-        # set new
         self.agents[agent.id] = agent
         self.areas[agent.x][agent.y] = agent.id
+        area = {"x": agent.x, "y": agent.y}
+        if area in self.targets:
+            self.targets.remove(area)
 
     # update targets information got from agent
     def updateTargets(self, targets):
         for target in targets:
-            self.targets.append(target)
-            self.areas[target["x"]][target["y"]] = State["target"]
+            if not target in self.targets:
+                self.targets.append(target)
+                self.areas[target["x"]][target["y"]] = State["target"]
 
     # update obstacles information got from agent
     def updateObstacles(self, obstacles):
         for obstable in obstacles:
-            self.obstacles.append(obstable)
-            self.areas[obstable["x"]][obstable["y"]] = State["obstacle"]
+            if not obstable in self.obstacles:
+                self.obstacles.append(obstable)
+                self.areas[obstable["x"]][obstable["y"]] = State["obstacle"]
+
+    def updateObserveAreas(self, areas):
+        for area in areas:
+            self.areas[area["x"]][area["y"]] = State["emptyGray"]

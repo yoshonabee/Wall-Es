@@ -1,6 +1,7 @@
-from maps import GodMap, ConsoleMap
+from maps import GodMap, ConsoleMap, State
 from agent import Agent
 import random
+import numpy as np
 
 
 class Game():
@@ -39,11 +40,13 @@ class Game():
     def runOneRound(self, commands):
         for command in commands:
             agent = self.consolemap.agents[command.id]
-            agent.move(command.dx, command.dy)
-            (foundTargets, foundObstacles) = agent.observe(self.godmap)
+            agent.move(command.dx, command.dy, self.consolemap)
+            (areas, foundTargets, foundObstacles) = agent.observe(self.godmap)
+            self.consolemap.updateObserveAreas(areas)
             self.consolemap.updateTargets(foundTargets)
             self.consolemap.updateObstacles(foundObstacles)
-            self.consolemap.updateAgent(agent)
+            self.consolemap.updateAgent(agent) # must at the end
+
 
     def printConsoleInfo(self):
         agents = []
@@ -62,6 +65,70 @@ class Game():
         print(self.godmap.targets)
         print("God: obstacles")
         print(self.godmap.obstacles)
+
+    def outputAgentImage(self, agentId):
+        map = np.zeros((self.width, self.height, 3))
+        for x in range(0, self.width):
+            for y in range(0, self.height):
+                area = self.consolemap.areas[x][y]
+                if area is agentId:
+                    map[(x, y)] = [0, 102, 255]  # blue, this agent
+                elif area is State["emptyWhite"]:
+                    map[(x, y)] = [255, 255, 255]  # white
+                elif area is State["emptyGray"]:
+                    map[(x, y)] = [204, 204, 204]  # gray
+                elif area is State["target"]:
+                    map[(x, y)] = [255, 51, 0]  # red
+                elif area is State["obstacle"]:
+                    map[(x, y)] = [0, 0, 0]  # black
+                else:
+                    map[(x, y)] = [51, 204, 51]  # green, other agents
+        return map
+
+    def outputGodImage(self):
+        map = np.zeros((self.width, self.height, 3))
+        for x in range(0, self.width):
+            for y in range(0, self.height):
+                area = self.godmap.areas[x][y]
+                if area is State["emptyWhite"]:
+                    map[(x, y)] = [255, 255, 255]  # white
+                elif area is State["target"]:
+                    map[(x, y)] = [255, 51, 0]  # red
+                elif area is State["obstacle"]:
+                    map[(x, y)] = [0, 0, 0]  # black
+        return map
+
+    def printGodMap(self):
+        print("<- God Map ->")
+        for x in range(0, self.width):
+            row = ""
+            for y in range(0, self.height):
+                area = self.godmap.areas[x][y]
+                if area is State["emptyWhite"]:
+                    row += "█"
+                elif area is State["target"]:
+                    row += "◪"
+                elif area is State["obstacle"]:
+                    row += "X"
+            print(row)
+
+    def printConsoleMap(self):
+        print("<- Console Map ->")
+        for x in range(0, self.width):
+            row = ""
+            for y in range(0, self.height):
+                area = self.consolemap.areas[x][y]
+                if area is State["emptyWhite"]:
+                    row += "█"
+                elif area is State["emptyGray"]:
+                    row += "░"
+                elif area is State["target"]:
+                    row += "◪"
+                elif area is State["obstacle"]:
+                    row += "X"
+                else:
+                    row += str(area)
+            print(row)
 
 
 class Command():
