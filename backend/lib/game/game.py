@@ -70,32 +70,32 @@ class Game():
         map = np.zeros((self.width, self.height, 3))
         for x in range(0, self.width):
             for y in range(0, self.height):
-                area = self.consolemap.areas[x][y]
+                area = self.consolemap.areas[y][x]
                 if area is agentId:
-                    map[(x, y)] = [0, 102, 255]  # blue, this agent
+                    map[(y, x)] = [0, 102, 255]  # blue, this agent
                 elif area is State["emptyWhite"]:
-                    map[(x, y)] = [255, 255, 255]  # white
+                    map[(y, x)] = [255, 255, 255]  # white
                 elif area is State["emptyGray"]:
-                    map[(x, y)] = [204, 204, 204]  # gray
+                    map[(y, x)] = [204, 204, 204]  # gray
                 elif area is State["target"]:
-                    map[(x, y)] = [255, 51, 0]  # red
+                    map[(y, x)] = [255, 51, 0]  # red
                 elif area is State["obstacle"]:
-                    map[(x, y)] = [0, 0, 0]  # black
+                    map[(y, x)] = [0, 0, 0]  # black
                 else:
-                    map[(x, y)] = [51, 204, 51]  # green, other agents
+                    map[(y, x)] = [51, 204, 51]  # green, other agents
         return map
 
     def outputGodImage(self):
         map = np.zeros((self.width, self.height, 3))
         for x in range(0, self.width):
             for y in range(0, self.height):
-                area = self.godmap.areas[x][y]
+                area = self.godmap.areas[y][x]
                 if area is State["emptyWhite"]:
-                    map[(x, y)] = [255, 255, 255]  # white
+                    map[(y, x)] = [255, 255, 255]  # white
                 elif area is State["target"]:
-                    map[(x, y)] = [255, 51, 0]  # red
+                    map[(y, x)] = [255, 51, 0]  # red
                 elif area is State["obstacle"]:
-                    map[(x, y)] = [0, 0, 0]  # black
+                    map[(y, x)] = [0, 0, 0]  # black
         return map
 
     def printGodMap(self):
@@ -103,7 +103,7 @@ class Game():
         for x in range(0, self.width):
             row = ""
             for y in range(0, self.height):
-                area = self.godmap.areas[x][y]
+                area = self.godmap.areas[y][x]
                 if area is State["emptyWhite"]:
                     row += "█"
                 elif area is State["target"]:
@@ -117,7 +117,7 @@ class Game():
         for x in range(0, self.width):
             row = ""
             for y in range(0, self.height):
-                area = self.consolemap.areas[x][y]
+                area = self.consolemap.areas[y][x]
                 if area is State["emptyWhite"]:
                     row += "█"
                 elif area is State["emptyGray"]:

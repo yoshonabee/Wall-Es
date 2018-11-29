@@ -27,14 +27,14 @@ class BaseMap():
         self.height = height
         self.width = width
         self.areas = [[State["emptyWhite"]
-                       for x in range(self.width)] for y in range(self.height)]
+                       for y in range(self.height)] for x in range(self.width)]
         self.targets = []
         self.obstacles = []
         # agents is dict. In convenience for finding the certain one
         self.agents = {}
 
     def answerArea(self, area):
-        return self.areas[area["x"]][area["y"]]
+        return self.areas[area["y"]][area["x"]]
 
 
 """
@@ -47,12 +47,12 @@ class GodMap(BaseMap):
     def setObstacles(self, obstacles):
         self.obstacles = obstacles
         for obstacle in obstacles:
-            self.areas[obstacle["x"]][obstacle["y"]] = State["obstacle"]
+            self.areas[obstacle["y"]][obstacle["x"]] = State["obstacle"]
 
     def setTargets(self, targets):
         self.targets = targets
         for target in targets:
-            self.areas[target["x"]][target["y"]] = State["target"]
+            self.areas[target["y"]][target["x"]] = State["target"]
 
     def setRandomObstables(self, obstacles_number):
         self.obstacles = []
@@ -61,7 +61,7 @@ class GodMap(BaseMap):
             y = random.randint(0, self.height - 1)
             obstacle = {"x": x, "y": y}
             self.obstacles.append(obstacle)
-            self.areas[obstacle["x"]][obstacle["y"]] = State["obstacle"]
+            self.areas[obstacle["y"]][obstacle["x"]] = State["obstacle"]
 
     def setRandomTargets(self, targets_number):
         self.targets = []
@@ -70,7 +70,7 @@ class GodMap(BaseMap):
             y = random.randint(0, self.height - 1)
             target = {"x": x, "y": y}
             self.targets.append(target)
-            self.areas[target["x"]][target["y"]] = State["target"]
+            self.areas[target["y"]][target["x"]] = State["target"]
 
 
 """
@@ -85,14 +85,14 @@ class ConsoleMap(BaseMap):
         self.agents = agents
         for id in agents:
             agent = agents[id]
-            self.areas[agent.x][agent.y] = agent.id
+            self.areas[agent.y][agent.x] = agent.id
 
     # update all agents position
     def updateAgents(self, agents):
         self.agents = agents
         for id in agents:
             agent = self.agents[id]
-            self.areas[agent.x][agent.y] = agent.id
+            self.areas[agent.y][agent.x] = agent.id
             area = {"x": agent.x, "y": agent.y}
             if area in self.targets:
                 print("find")
@@ -101,7 +101,7 @@ class ConsoleMap(BaseMap):
     # update a agent's position
     def updateAgent(self, agent):
         self.agents[agent.id] = agent
-        self.areas[agent.x][agent.y] = agent.id
+        self.areas[agent.y][agent.x] = agent.id
         area = {"x": agent.x, "y": agent.y}
         if area in self.targets:
             self.targets.remove(area)
@@ -111,15 +111,15 @@ class ConsoleMap(BaseMap):
         for target in targets:
             if not target in self.targets:
                 self.targets.append(target)
-                self.areas[target["x"]][target["y"]] = State["target"]
+                self.areas[target["y"]][target["x"]] = State["target"]
 
     # update obstacles information got from agent
     def updateObstacles(self, obstacles):
         for obstable in obstacles:
             if not obstable in self.obstacles:
                 self.obstacles.append(obstable)
-                self.areas[obstable["x"]][obstable["y"]] = State["obstacle"]
+                self.areas[obstable["y"]][obstable["x"]] = State["obstacle"]
 
     def updateObserveAreas(self, areas):
         for area in areas:
-            self.areas[area["x"]][area["y"]] = State["emptyGray"]
+            self.areas[area["y"]][area["x"]] = State["emptyGray"]

@@ -20,9 +20,9 @@ class Agent:
         y = self.y + dy
         if not ((x > 0 and x < self.width) and ( y > 0 and y < self.height)):
             raise Exception('Move out boundary!')
-        if consolemap.areas[x][y] is State["obstacle"]:
+        if consolemap.areas[y][x] is State["obstacle"]:
             raise Exception('Move to obstacle!')
-        consolemap.areas[self.x][self.y] = State["emptyGray"]
+        consolemap.areas[self.y][self.x] = State["emptyGray"]
         self.x = x
         self.y = y
 
@@ -48,13 +48,13 @@ class Agent:
                 newTargets.append(area)
                 if area in godmap.targets:
                     godmap.targets.remove(area)
-                    godmap.areas[area["x"]][area["y"]] = State["emptyGray"]
+                    godmap.areas[area["y"]][area["x"]] = State["emptyGray"]
             elif(state is State["obstacle"]):
                 newObstacles.append(area)
                 if area in godmap.obstacles:
                     godmap.obstacles.remove(area)
-                    godmap.areas[area["x"]][area["y"]] = State["emptyGray"]
+                    godmap.areas[area["y"]] [area["x"]]= State["emptyGray"]
             elif(state is State["emptyWhite"]):
                 newObserveAreas.append(area)
-                godmap.areas[area["x"]][area["y"]] = State["emptyGray"]
+                godmap.areas[area["y"]][area["x"]] = State["emptyGray"]
         return (newObserveAreas, newTargets, newObstacles)
