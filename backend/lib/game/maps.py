@@ -27,7 +27,7 @@ class BaseMap():
         self.height = height
         self.width = width
         self.areas = [[State["emptyWhite"]
-                       for y in range(self.height)] for x in range(self.width)]
+                       for x in range(self.width)] for y in range(self.height)]
         self.targets = []
         self.obstacles = []
         # agents is dict. In convenience for finding the certain one
