@@ -87,8 +87,8 @@ class Game():
 
     def outputGodImage(self):
         map = np.zeros((self.width, self.height, 3))
-        for x in range(0, self.width):
-            for y in range(0, self.height):
+        for y in range(0, self.height):
+            for x in range(0, self.width):
                 area = self.godmap.areas[y][x]
                 if area is State["emptyWhite"]:
                     map[(y, x)] = [255, 255, 255]  # white
@@ -100,9 +100,9 @@ class Game():
 
     def printGodMap(self):
         print("<- God Map ->")
-        for x in range(0, self.width):
+        for y in range(0, self.height):
             row = ""
-            for y in range(0, self.height):
+            for x in range(0, self.width):
                 area = self.godmap.areas[y][x]
                 if area is State["emptyWhite"]:
                     row += "█"
@@ -114,9 +114,9 @@ class Game():
 
     def printConsoleMap(self):
         print("<- Console Map ->")
-        for x in range(0, self.width):
+        for y in range(0, self.height):
             row = ""
-            for y in range(0, self.height):
+            for x in range(0, self.width):
                 area = self.consolemap.areas[y][x]
                 if area is State["emptyWhite"]:
                     row += "█"
