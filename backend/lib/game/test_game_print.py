@@ -37,30 +37,57 @@ def testManualGameImageOutput1():
     game.runOneRound([Command(0, -1, 0)]) #(4, 5)
     game.printConsoleMap()
 
+def target_agent_len(target,agent):
+    return (target['x']-agent.x)*(target['x']-agent.x)+(target['y']-agent.y)*(target['y']-agent.y)
 def testManualGameImageOutput2():
     print("\n== init manual setting game ==")
     height = 20
     width = 20
+    mode ={0:False,1:False,2:False}  
+    #now target = {0:{},1:{},2:{}}
+    belongs = {0:[],1:[],2:[]}
     game = Game(height, width)
 
-    game.setRandomMap(0, 20, 0) # numbers of agents, targets, obstacles
+    game.setRandomMap(0, 50, 0) # numbers of agents, targets, obstacles
 
 
     game.printGodMap()
 
     agents = {
         0: Agent(0, 0, 0, height, width, r=5), # id, x, y, height, width
-        1: Agent(1, 0, 10, height, width, r=5), # id, x, y, height, width
-        2: Agent(2, 19, 19, height, width, r=5), # id, x, y, height, width
+        1: Agent(1, width-1 , 0, height, width, r=5), # id, x, y, height, width
+        2: Agent(2, int(width/2) , height-1 , height, width, r=5), # id, x, y, height, width
     }
     game.setAgents(agents)
-
+    #agents[id].x,game.consolemap.targets
     game.printConsoleMap()
-
-    for i in range(0, 10):
+    game.runOneRound([Command(0, 1, 1), Command(1, -1, 1), Command(2, -1, -1)])
+    for item in game.consolemap.targets:
+        index = 0
+        if target_agent_len(item,agents[index])>target_agent_len(item,agents[1]):
+            index = 1
+        if target_agent_len(item,agents[index])>target_agent_len(item,agents[2]):
+            index = 2
+        belongs[index].append(item)
+    print(belongs)
+    for i in range(3):
+        if mode[i] == False:
+            target_find = belongs[i][0]
+            for target_list in belongs[i]:
+                if target_agent_len(target_list,agents[i]) < target_agent_len(target_find,agents[i]):
+                    target_find = target_list
+            print(target_find)
+            mode[i] = True
+        
+        
+    
+    game.printConsoleMap()
+    '''for i in range(0, 10):
+        
         print("\n== %dst round ==" % i)
+        
         game.runOneRound([Command(0, 1, 1), Command(1, 1, 0), Command(2, -1, -1)])
-        game.printConsoleMap()
+        game.printConsoleMap()'''
 
 testManualGameImageOutput1()
 testManualGameImageOutput2()
