@@ -38,6 +38,7 @@ def newGame():
     game = Game(height, width)
     game.setRandomMap(int(t*0.3), int(t*0.4)**2, int(t*0.3)**2)
     game.printGodMap()
+    game.runOneRoundwithoutMovement()
     game.printConsoleMap()
     return game.jsonMap()
 
