@@ -1,0 +1,166 @@
+<head>
+    <script src="./js/two.js"></script>
+    <style>
+        * {
+        font-size: 16px;
+    }
+    </style>
+</head>
+
+<body>
+    Height: <input id="height" type="number" value="20">
+    Width: <input id="width" type="number" value="20">
+    <button onclick="start()" id="start">start new game</button>
+    <div id="gamemap" style="padding: 20px">
+    </div>
+
+    <script>
+        class Game {
+            constructor(id, width, height, size) {
+                this.width = width;
+                this.height = height;
+                this.size = size || 20;
+                const elem = document.getElementById(id);
+                this.two = new Two({
+                    width: this.width * this.size,
+                    height: this.height * this.size
+                }).appendTo(elem);
+            }
+
+            makeGrids() {
+                for (let i = 0; i < this.height; i++) {
+                    for (let j = 0; j < this.width; j++) {
+                        // vertical
+                        let x1 = j * this.size;
+                        let x2 = x1;
+                        let y1 = 0;
+                        let y2 = (this.height - 1) * this.size;
+                        const a = this.two.makeLine(x1, y1, x2, y2);
+
+                        // horizontal
+                        y1 = y2 = i * this.size;
+                        x1 = 0;
+                        x2 = (this.width - 1) * this.size;
+                        const b = this.two.makeLine(x1, y1, x2, y2);
+                        b.stroke = a.stroke = '#6dcff6';
+                    }
+                }
+            }
+
+            setAgents(agents) {
+                for (const agent of agents) {
+                    this.setAgent(agent);
+                }
+            }
+
+            setAgent(agent) {
+                const circle = this.two.makeCircle(agent.x * this.size, agent.y * this.size, this.size / 1.5);
+                circle.fill = '#FF8000';
+                const text = this.two.makeText(agent.id.toString(), agent.x * this.size, agent.y * this.size);
+                text.fill = "white";
+
+                const circleVision =
+                    this.two.makeCircle(agent.x * this.size, agent.y * this.size, this.size * 10);
+                circleVision.noFill();
+                circleVision.stroke = "red";
+            }
+
+            setTargets(targets) {
+                for (const target of targets) {
+                    this.setTarget(target);
+                }
+            }
+
+            setTarget(target) {
+                const rect =
+                    this.two.makeRectangle(target.x * this.size, target.y * this.size, this.size, this.size);
+                rect.fill = 'rgba(0, 200, 255, 0.75)';
+            }
+
+            setObstacles(obstacles) {
+                for (const obstacle of obstacles) {
+                    this.setObstacle(obstacle);
+                }
+            }
+
+            setObstacle(obstacle) {
+                const poly = this.two.makePolygon(obstacle.x * this.size, obstacle.y * this.size, this.size / 3,
+                    6);
+                poly.fill = 'green';
+            }
+
+            setBlacks(areas) {
+                for (const area of areas) {
+                    this.setBlack(area);
+                }
+            }
+
+            setBlack(area) {
+                const rect = this.two.makeRectangle(area.x * this.size, area.y * this.size, this.size, this
+                    .size);
+                rect.fill = 'black';
+            }
+
+            update() {
+                this.two.update();
+            }
+        }
+
+        function start() {
+            document.getElementById("gamemap").innerHTML = "";
+            const height = document.getElementById("height").value;
+            const width = document.getElementById("width").value;
+            const game = new Game("gamemap", height, width, 400 / height);
+            game.makeGrids();
+            game.update();
+            fetch(`http://127.0.0.1:5000/newGame?height=${height}&width=${width}`)
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (data) {
+                    console.log(data);
+                    mapDraw(game, data);
+                });
+        }
+
+        function mapDraw(game, areas) {
+            const agents = [];
+            const targets = [];
+            const blacks = [];
+            const obstacles = [];
+            for (let i = 0; i < areas.length; i++) {
+                for (let j = 0; j < areas[0].length; j++) {
+                    const a = areas[i][j];
+                    if (a == -3) {
+                        blacks.push({
+                            x: j,
+                            y: i
+                        });
+                    } else if (a == -1) {
+                        obstacles.push({
+                            x: j,
+                            y: i
+                        });
+
+                    } else if (a == -2) {
+                        targets.push({
+                            x: j,
+                            y: i
+                        });
+                    } else if (a >= 0) {
+                        agents.push({
+                            x: j,
+                            y: i,
+                            id: a
+                        });
+                    }
+                }
+            }
+            game.setBlacks(blacks);
+            game.setObstacles(obstacles);
+            game.setTargets(targets);
+            game.setAgents(agents);
+            game.update();
+        }
+    </script>
+</body>
