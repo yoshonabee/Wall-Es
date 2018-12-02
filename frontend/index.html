@@ -58,11 +58,6 @@
                 circle.fill = '#FF8000';
                 const text = this.two.makeText(agent.id.toString(), agent.x * this.size, agent.y * this.size);
                 text.fill = "white";
-
-                const circleVision =
-                    this.two.makeCircle(agent.x * this.size, agent.y * this.size, this.size * 10);
-                circleVision.noFill();
-                circleVision.stroke = "red";
             }
 
             setTargets(targets) {
@@ -110,7 +105,7 @@
             document.getElementById("gamemap").innerHTML = "";
             const height = document.getElementById("height").value;
             const width = document.getElementById("width").value;
-            const game = new Game("gamemap", height, width, 400 / height);
+            const game = new Game("gamemap", height, width, 600 / height);
             game.makeGrids();
             game.update();
             fetch(`http://127.0.0.1:5000/newGame?height=${height}&width=${width}`)
