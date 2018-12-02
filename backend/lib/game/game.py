@@ -2,6 +2,7 @@ from lib.game.maps import GodMap, ConsoleMap, State
 from lib.game.agent import Agent
 import random
 import numpy as np
+import json
 
 
 class Game():
@@ -130,6 +131,8 @@ class Game():
                     row += str(area)
             print(row)
 
+    def jsonMap(self):
+        return json.dumps(self.consolemap.areas)
 
 class Command():
     def __init__(self, id, dx, dy):
