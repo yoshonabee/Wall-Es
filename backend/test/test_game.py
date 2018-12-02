@@ -1,23 +1,26 @@
-from game import Game, Command
-from agent import Agent
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+
+from lib.game.game import Game, Command
+from lib.game.agent import Agent
 
 def randomGame():
     print("\n== init random game ==")
-    game = Game(20, 20) # height, width
-    game.setRandomMap(3, 3, 4) # numbers of agents, targets, obstacles
+    game = Game(20, 20)  # height, width
+    game.setRandomMap(3, 3, 4)  # numbers of agents, targets, obstacles
 
     game.printGodInfo()
 
     print("\n== 1st round ==")
     commands = []
-    commands.append(Command(0, 1, 1)) # id, dx, dy
+    commands.append(Command(0, 1, 1))  # id, dx, dy
     commands.append(Command(1, -1, 1))
     commands.append(Command(2, 1, -1))
 
     game.runOneRound(commands)
 
     game.printConsoleInfo()
-
 
     print("\n== 2ed round ==")
     commands = []
@@ -28,6 +31,7 @@ def randomGame():
     game.runOneRound(commands)
 
     game.printConsoleInfo()
+
 
 def manualGame():
     print("\n== init manual setting game ==")
@@ -45,7 +49,7 @@ def manualGame():
     game.setTargets(targets)
 
     agents = {
-        0: Agent(0, 4, 4, height, width), # id, x, y, height, width
+        0: Agent(0, 4, 4, height, width),  # id, x, y, height, width
         1: Agent(1, 15, 17, height, width),
         2: Agent(2, 12, 15, height, width),
     }
@@ -55,14 +59,13 @@ def manualGame():
 
     print("\n== 1st round ==")
     commands = []
-    commands.append(Command(0, 1, 1)) # id, dx, dy
+    commands.append(Command(0, 1, 1))  # id, dx, dy
     commands.append(Command(1, -1, 1))
     commands.append(Command(2, 1, -1))
 
     game.runOneRound(commands)
 
     game.printConsoleInfo()
-
 
     print("\n== 2ed round ==")
     commands = []

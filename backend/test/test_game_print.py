@@ -1,5 +1,9 @@
-from game import Game, Command
-from agent import Agent
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+
+from lib.game.game import Game, Command
+from lib.game.agent import Agent
 
 def testManualGameImageOutput1():
     print("\n== init manual setting game ==")

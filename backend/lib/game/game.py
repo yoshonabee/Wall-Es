@@ -1,5 +1,5 @@
-from maps import GodMap, ConsoleMap, State
-from agent import Agent
+from lib.game.maps import GodMap, ConsoleMap, State
+from lib.game.agent import Agent
 import random
 import numpy as np
 

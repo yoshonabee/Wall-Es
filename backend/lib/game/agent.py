@@ -3,7 +3,7 @@ Module Agent
 """
 
 import math
-from maps import State
+from lib.game.maps import State
 
 
 class Agent:
