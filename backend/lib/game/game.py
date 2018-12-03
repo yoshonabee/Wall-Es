@@ -26,12 +26,14 @@ class Game():
 
     def setAgents(self, agents):
         self.consolemap.setAgents(agents)
+        self.agents_number = agents
 
     def setObstacles(self, obstacles):
         self.godmap.setObstacles(obstacles)
 
     def setTargets(self, targets):
         self.godmap.setTargets(targets)
+        self.targets_number = len(targets)
 
     def setRandomMap(self, agents_number, targets_number, obstacles_number):
         self.godmap.setRandomObstables(obstacles_number)
@@ -125,18 +127,19 @@ class Game():
 
     def outputScore(self):
         counting = 0
+        collected_targets_ratio = 1 - len(self.godmap.targets) / self.targets_number
         for y in range(0, self.height):
             for x in range(0, self.width):
-                area = self.godmap.areas[y][x]
+                area = self.consolemap.areas[y][x]
                 if area is not State["emptyWhite"]:
                     counting += 1
 
         explored_ratio = 1 - counting / (self.height * self.width)
 
-        score = self.state * self.time_decrease + explored_ratio * self.explored_sum
+        score = self.state * self.time_decrease + explored_ratio * self.explored_sum + collected_targets_ratio * self.acquisition_sum
         #unfinished
 
-        return score 
+        return explored_ratio
 
     def printGodMap(self):
         print("<- God Map ->")
