@@ -10,6 +10,12 @@ class Game():
         self.height = height
         self.width = width
 
+        #initial state of the game score calculatiing
+        #score initial is zero
+        self.agents_number = 0
+        self.targets_number = 0
+        self.state = 0
+
         # godmap will be asked when agent observing
         # only god knows target and obstacles at the beginning
         self.godmap = GodMap(height, width)
@@ -30,6 +36,8 @@ class Game():
     def setRandomMap(self, agents_number, targets_number, obstacles_number):
         self.godmap.setRandomObstables(obstacles_number)
         self.godmap.setRandomTargets(targets_number)
+        self.targets_number = targets_number
+        self.agents_number = agents_number
         agents = {}
         for id in range(0, agents_number):
             x = random.randint(0, self.width - 1)
@@ -38,7 +46,17 @@ class Game():
             agents[id] = agent
         self.setAgents(agents)
 
+    def setScore(self, acquisition_sum, explored_sum, time_decrease, crash_decrease):
+        #the score calculating standard of the game
+        self.explored_sum = explored_sum
+        self.acquisition_sum = acquisition_sum
+        self.time_decrease = time_decrease
+        self.crash_decrease = crash_decrease
+
+        self.score = 0
+
     def runOneRound(self, commands):
+        self.state += 1
         for command in commands:
             agent = self.consolemap.agents[command.id]
             agent.move(command.dx, command.dy, self.consolemap)
@@ -104,6 +122,21 @@ class Game():
                 elif area is State["obstacle"]:
                     map[(y, x)] = [0, 0, 0]  # black
         return map
+
+    def outputScore(self):
+        counting = 0
+        for y in range(0, self.height):
+            for x in range(0, self.width):
+                area = self.godmap.areas[y][x]
+                if area is not State["emptyWhite"]:
+                    counting += 1
+
+        explored_ratio = 1 - counting / (self.height * self.width)
+
+        score = self.state * self.time_decrease + explored_ratio * self.explored_sum
+        #unfinished
+
+        return score 
 
     def printGodMap(self):
         print("<- God Map ->")

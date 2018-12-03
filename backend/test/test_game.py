@@ -9,6 +9,7 @@ def randomGame():
     print("\n== init random game ==")
     game = Game(20, 20)  # height, width
     game.setRandomMap(3, 3, 4)  # numbers of agents, targets, obstacles
+    game.setScore(100, 10, -0.01, -100)
 
     game.printGodInfo()
 
@@ -21,6 +22,7 @@ def randomGame():
     game.runOneRound(commands)
 
     game.printConsoleInfo()
+    print("Score: " + str(game.outputScore()))
 
     print("\n== 2ed round ==")
     commands = []
@@ -31,7 +33,7 @@ def randomGame():
     game.runOneRound(commands)
 
     game.printConsoleInfo()
-
+    print("Score: " + str(game.outputScore()))
 
 def manualGame():
     print("\n== init manual setting game ==")
@@ -54,6 +56,7 @@ def manualGame():
         2: Agent(2, 12, 15, height, width),
     }
     game.setAgents(agents)
+    game.setScore(100, 10, -0.01, -100)
 
     game.printGodInfo()
 
@@ -66,6 +69,7 @@ def manualGame():
     game.runOneRound(commands)
 
     game.printConsoleInfo()
+    print("Score: " + str(game.outputScore()))
 
     print("\n== 2ed round ==")
     commands = []
@@ -76,6 +80,7 @@ def manualGame():
     game.runOneRound(commands)
 
     game.printConsoleInfo()
+    print("Score: " + str(game.outputScore()))
 
 
 randomGame()

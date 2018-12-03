@@ -19,6 +19,7 @@ def testManualGameImageOutput1():
     ]
     game.setObstacles(obstacles)
     game.setTargets(targets)
+    game.setScore(100, 10, -0.01, -100)
 
     game.printGodMap()
 
@@ -53,6 +54,7 @@ def testManualGameImageOutput2():
     game = Game(height, width)
 
     game.setRandomMap(0, 50, 0) # numbers of agents, targets, obstacles
+    game.setScore(100, 10, -0.01, -100)
 
 
     game.printGodMap()
