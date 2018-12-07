@@ -89,7 +89,7 @@ def testManualGameImageOutput2():
     game.setAgents(agents)
     game.printConsoleMap()    
     ##########
-    game.runOneRound([Command(0, 1, 1), Command(1, -1, 1), Command(2, 0, -1)])
+    game.runOneRound([Command(0, 0, 0), Command(1, 0, 0), Command(2, 0, 0)])
 
     for round in range(10):
         print("====the %d round" % round)
@@ -106,8 +106,8 @@ def testManualGameImageOutput2():
                 else:
                     now_target[i]=[]
                     mode[i] = False
-        print("found:",found_target)        
-        print("agent mode",mode)           
+           
+             
         for item in found_target:
             index = 0
             if target_agent_len(item,agents[index])>target_agent_len(item,agents[1]):
@@ -131,6 +131,9 @@ def testManualGameImageOutput2():
             print()
             
         game.runOneRound(cmd)
+        print("agent%d position:(%d,%d)" %(agents[0].id,agents[0].x,agents[0].y))
+        print("agent%d position:(%d,%d)" %(agents[1].id,agents[1].x,agents[1].y))
+        print("agent%d position:(%d,%d)" %(agents[2].id,agents[2].x,agents[2].y))
         game.printConsoleMap()
         belongs = {0:[],1:[],2:[]}
     '''for i in range(0, 10):
