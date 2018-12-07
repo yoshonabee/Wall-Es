@@ -44,13 +44,34 @@ def testManualGameImageOutput1():
 
 def target_agent_len(target,agent):
     return (target['x']-agent.x)*(target['x']-agent.x)+(target['y']-agent.y)*(target['y']-agent.y)
+def walk(target,agent):
+    x = 0
+    y = 0
+    if (target['x'] - agent.x) > 0:
+        x = 1
+    elif (target['x'] - agent.x) == 0:
+        x = 0
+    else:
+        x = -1
+    if (target['y'] - agent.y) > 0:
+        y = 1
+    elif (target['y'] - agent.y) == 0:
+        y = 0
+    else:
+        y = -1
+    print("agent %d  goes" % agent.id,x,"and",y)
+    return Command(agent.id,x,y)
 def testManualGameImageOutput2():
     print("\n== init manual setting game ==")
     height = 20
     width = 20
-    mode ={0:False,1:False,2:False}  
-    #now target = {0:{},1:{},2:{}}
+    
+    mode ={0:False,1:False,2:False} #agents' mode True if agent has target rightnow
+    found_target = []    
+    now_target = {0:[],1:[],2:[]}    
     belongs = {0:[],1:[],2:[]}
+    cmd = []
+    
     game = Game(height, width)
 
     game.setRandomMap(0, 50, 0) # numbers of agents, targets, obstacles
@@ -64,30 +85,54 @@ def testManualGameImageOutput2():
         1: Agent(1, width-1 , 0, height, width, r=5), # id, x, y, height, width
         2: Agent(2, int(width/2) , height-1 , height, width, r=5), # id, x, y, height, width
     }
-    game.setAgents(agents)
-    #agents[id].x,game.consolemap.targets
-    game.printConsoleMap()
-    game.runOneRound([Command(0, 1, 1), Command(1, -1, 1), Command(2, -1, -1)])
-    for item in game.consolemap.targets:
-        index = 0
-        if target_agent_len(item,agents[index])>target_agent_len(item,agents[1]):
-            index = 1
-        if target_agent_len(item,agents[index])>target_agent_len(item,agents[2]):
-            index = 2
-        belongs[index].append(item)
-    print(belongs)
-    for i in range(3):
-        if mode[i] == False:
-            target_find = belongs[i][0]
-            for target_list in belongs[i]:
-                if target_agent_len(target_list,agents[i]) < target_agent_len(target_find,agents[i]):
-                    target_find = target_list
-            print(target_find)
-            mode[i] = True
-        
-        
     
-    game.printConsoleMap()
+    game.setAgents(agents)
+    game.printConsoleMap()    
+    ##########
+    game.runOneRound([Command(0, 1, 1), Command(1, -1, 1), Command(2, 0, -1)])
+
+    for round in range(10):
+        print("====the %d round" % round)
+        
+        
+        found_target = game.consolemap.targets
+        
+        
+        for i in range(3):
+            if mode[i] is True:
+                if now_target[i] in found_target:
+                    found_target.remove(now_target[i])
+        
+                else:
+                    now_target[i]=[]
+                    mode[i] = False
+        print("found:",found_target)        
+        print("agent mode",mode)           
+        for item in found_target:
+            index = 0
+            if target_agent_len(item,agents[index])>target_agent_len(item,agents[1]):
+                index = 1
+            if target_agent_len(item,agents[index])>target_agent_len(item,agents[2]):
+                index = 2
+            belongs[index].append(item)
+        cmd = []
+        for i in range(3):
+            
+            if mode[i] == False:
+                target_find = belongs[i][0]
+                for target_list in belongs[i]:
+                    if target_agent_len(target_list,agents[i]) < target_agent_len(target_find,agents[i]):
+                        target_find = target_list
+               
+                now_target[i] = target_find
+                mode[i] = True
+            print(now_target[i])
+            cmd.append(walk(now_target[i],agents[i]))
+            print()
+            
+        game.runOneRound(cmd)
+        game.printConsoleMap()
+        belongs = {0:[],1:[],2:[]}
     '''for i in range(0, 10):
         
         print("\n== %dst round ==" % i)
@@ -95,6 +140,6 @@ def testManualGameImageOutput2():
         game.runOneRound([Command(0, 1, 1), Command(1, 1, 0), Command(2, -1, -1)])
         game.printConsoleMap()'''
 
-testManualGameImageOutput1()
+
 testManualGameImageOutput2()
 

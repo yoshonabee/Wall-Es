@@ -56,7 +56,8 @@ class Game():
         self.crash_decrease = crash_decrease
 
         self.score = 0
-
+   
+        
     def runOneRound(self, commands):
         self.state += 1
         for command in commands:
