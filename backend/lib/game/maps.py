@@ -3,7 +3,7 @@ Module BaseMap
 """
 
 import random
-
+import numpy as np
 """
 State enum. Robots are added at run time.
 """
@@ -32,6 +32,7 @@ class BaseMap():
         self.obstacles = []
         # agents is dict. In convenience for finding the certain one
         self.agents = {}
+        self.cluster = []
 
     def answerArea(self, area):
         return self.areas[area["y"]][area["x"]]
@@ -86,6 +87,7 @@ class ConsoleMap(BaseMap):
         for id in agents:
             agent = agents[id]
             self.areas[agent.y][agent.x] = agent.id
+            self.cluster.append([])
 
     # update all agents position
     def updateAgents(self, agents):
@@ -123,3 +125,22 @@ class ConsoleMap(BaseMap):
     def updateObserveAreas(self, areas):
         for area in areas:
             self.areas[area["y"]][area["x"]] = State["emptyGray"]
+    
+    def targetclustering(self):
+        agent_location = []
+        dist = 0
+        for id in self.agents:
+            agent = self.agents[id]
+            location= {"x": agent.x, "y": agent.y}
+            agent_location.append(location)
+        for target_id in self.targets:
+            min_dist = 0
+            min_ind = 0
+            target = self.targets[target_id]
+            for num in location:
+                dist = np.sqrt(np.square(target["x"] - agent_location["x"]) + np.square(target["y"] - agent_location["y"]))
+                if min_dist == 0 or dist < min_dist:
+                    dist = min_dist
+                    min_ind = num
+            self.cluster[min_ind].append(target)
+            
