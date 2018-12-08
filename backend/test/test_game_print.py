@@ -87,9 +87,9 @@ def testManualGameImageOutput2():
     game.printGodMap()
 
     agents = {
-        0: Agent(0, 0, 0, height, width, r=3), # id, x, y, height, width
-        1: Agent(1, width-1 , 0, height, width, r=3), # id, x, y, height, width
-        2: Agent(2, int(width/2) , height-1 , height, width, r=3), # id, x, y, height, width
+        0: Agent(0, 0, 0, height, width, r=5), # id, x, y, height, width
+        1: Agent(1, width-1 , 0, height, width, r=5), # id, x, y, height, width
+        2: Agent(2, int(width/2) , height-1 , height, width, r=5), # id, x, y, height, width
     }
     
     game.setAgents(agents)
