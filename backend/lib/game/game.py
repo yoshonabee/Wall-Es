@@ -68,6 +68,7 @@ class Game():
             self.consolemap.updateTargets(foundTargets)
             self.consolemap.updateObstacles(foundObstacles)
             self.consolemap.updateAgent(agent) # must at the end
+            print("agent%d position:(%d,%d)" %(agent.id,agent.x,agent.y))
 
     def runOneRoundwithoutMovement(self):
         commands = []
