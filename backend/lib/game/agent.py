@@ -18,7 +18,7 @@ class Agent:
     def move(self, dx, dy, consolemap):
         x = self.x + dx
         y = self.y + dy
-        if not ((x > 0 and x < self.width) and ( y > 0 and y < self.height)):
+        if not ((x >= 0 and x < self.width) and ( y >= 0 and y < self.height)):
             raise Exception('Move out boundary!')
         if consolemap.areas[y][x] is State["obstacle"]:
             raise Exception('Move to obstacle!')
