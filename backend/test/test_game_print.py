@@ -97,12 +97,10 @@ def testManualGameImageOutput2():
     game.runOneRound([Command(0, 0, 0), Command(1, 0, 0), Command(2, 0, 0)])
     game.printConsoleMap()   
     
-    for round in range(1, 11):
+    for round in range(1, 50):
         print("====the %d round" % round)
         
-        
         found_target = game.consolemap.targets
-        
         
         for i in range(3):
             print(agents[i].x, " ", agents[i].y)
@@ -130,14 +128,17 @@ def testManualGameImageOutput2():
             if mode[i] == False:
                 now_target[i] = None
                 for target_list in belongs[i]:
-                    if now_target[i] == None:
+                    if now_target[i] == None and target_list != None:
                         now_target[i] = target_list
+                        mode[i] = True
                     elif target_list != None and now_target[i] != None:
                         if target_agent_len(target_list,agents[i]) < target_agent_len(now_target[i],agents[i]):
-                            now_target[i] = target_list               
-                
-                mode[i] = True
-            if now_target[i] == None:
+                            now_target[i] = target_list      
+                            mode[i] = True
+                    elif target_list == None:
+                        mode[i] = False
+            
+            if mode[i] == False:
                 if agents[i].x <= np.int(width / 2) and agents[i].y <= np.int(height / 2):
                     cmd.append(Command(agents[i].id, np.random.randint(0, 2), np.random.randint(0, 2)))
                 elif agents[i].x <= np.int(width / 2) and agents[i].y > np.int(height / 2):
@@ -146,18 +147,15 @@ def testManualGameImageOutput2():
                     cmd.append(Command(agents[i].id, np.random.randint(-2, 0), np.random.randint(0, 2)))
                 elif agents[i].x > np.int(width / 2) and agents[i].y > np.int(height / 2):
                     cmd.append(Command(agents[i].id, np.random.randint(-2, 0), np.random.randint(-2, 0)))
-                print('a')  
-            else:
-                cmd.append(walk(now_target[i],agents[i]))  
+            elif mode[i] == True:
+                cmd.append(walk(now_target[i],agents[i]))
+                mode[i] = False
         game.runOneRound(cmd)
-        print("agent%d position:(%d,%d)" %(agents[0].id,agents[0].x,agents[0].y))
-        print("agent%d position:(%d,%d)" %(agents[1].id,agents[1].x,agents[1].y))
-        print("agent%d position:(%d,%d)" %(agents[2].id,agents[2].x,agents[2].y))
         game.printConsoleMap()
         for i in agents:
-            print("Agent %d x: %d y: %d \n" %(agents[i].id, agents[i].x, agents[i].y))
+            print("agent%d position:(%d,%d)" %(agents[i].id,agents[i].x,agents[i].y))
+        print(belongs)
         belongs = {0:[],1:[],2:[]}
-
-
+        
 testManualGameImageOutput2()
 
