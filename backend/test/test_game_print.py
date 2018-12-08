@@ -71,6 +71,7 @@ def testManualGameImageOutput2():
     print("\n== init manual setting game ==")
     height = 20
     width = 20
+    crash = 0
     
     mode ={0:False,1:False,2:False} #agents' mode True if agent has target rightnow
     found_target = []    
@@ -140,12 +141,17 @@ def testManualGameImageOutput2():
                 mode[i] = False
                 
         game.runOneRound(cmd)
-                    
+        
+        for i in agents:
+            for j in range(i + 1, len(agents)):
+                if agents[i].x == agents[j].x and agents[i].y == agents[j].y:
+                    crash += 1
         print(found_target)
         
         game.printConsoleMap()
         belongs = {0:[],1:[],2:[]}
         round += 1
+    print("crush time: %d" %crash)
     print("finish")
         
 testManualGameImageOutput2()
