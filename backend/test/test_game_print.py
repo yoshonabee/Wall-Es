@@ -116,7 +116,7 @@ def testManualGameImageOutput2():
         #print("found:",found_target)        
         #print("agent mode",mode)           
         
-        for item in found_target: # cluster hte target
+        for item in found_target: # cluster the target
             index = 0
             if target_agent_len(item,agents[index])>target_agent_len(item,agents[1]):
                 index = 1
@@ -150,6 +150,9 @@ def testManualGameImageOutput2():
             else:
                 cmd.append(walk(now_target[i],agents[i]))  
         game.runOneRound(cmd)
+        print("agent%d position:(%d,%d)" %(agents[0].id,agents[0].x,agents[0].y))
+        print("agent%d position:(%d,%d)" %(agents[1].id,agents[1].x,agents[1].y))
+        print("agent%d position:(%d,%d)" %(agents[2].id,agents[2].x,agents[2].y))
         game.printConsoleMap()
         for i in agents:
             print("Agent %d x: %d y: %d \n" %(agents[i].id, agents[i].x, agents[i].y))
