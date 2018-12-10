@@ -24,6 +24,9 @@ class Game():
         # console will update targets and obstacles when agents find them
         self.consolemap = ConsoleMap(height, width)
 
+    def getmap(self):
+        return self.consolemap.areas
+    
     def setAgents(self, agents):
         self.consolemap.setAgents(agents)
         self.agents_number = agents

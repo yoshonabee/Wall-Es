@@ -81,7 +81,8 @@ back to them.
 
 
 class ConsoleMap(BaseMap):
-
+    
+    
     def setAgents(self, agents):
         self.agents = agents
         for id in agents:
