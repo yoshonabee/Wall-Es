@@ -7,7 +7,7 @@ from lib.torch.command import Command
 
 
 class modelGo():
-    def __init__(self, agent_num = 5, model_structure = ActorCritic(128, 128), model_weight = '../lib/torch/state_dict/weight.pkl'):
+    def __init__(self, agent_num = 5, model_structure = ActorCritic(128, 128), model_weight = 'backend/lib/torch/state_dict/weight.pkl'):
         self.model = model_structure
         self.model_weight = model_weight
 
