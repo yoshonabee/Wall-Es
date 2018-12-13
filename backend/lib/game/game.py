@@ -1,5 +1,9 @@
 from lib.game.maps import GodMap, ConsoleMap, State
 from lib.game.agent import Agent
+
+from lib.torch.model import ActorCritic
+from lib.torch.modelGo import modelGo
+
 import random
 import numpy as np
 import json
@@ -10,11 +14,7 @@ class Game():
         self.height = height
         self.width = width
 
-        #initial state of the game score calculatiing
-        #score initial is zero
-        self.agents_number = 0
-        self.targets_number = 0
-        self.state = 0
+        self.modelGo = modelGo()
 
         # godmap will be asked when agent observing
         # only god knows target and obstacles at the beginning
@@ -29,40 +29,33 @@ class Game():
     
     def setAgents(self, agents):
         self.consolemap.setAgents(agents)
-        self.agents_number = agents
+        self.agents_number = len(agents)
 
     def setObstacles(self, obstacles):
         self.godmap.setObstacles(obstacles)
 
     def setTargets(self, targets):
         self.godmap.setTargets(targets)
-        self.targets_number = len(targets)
 
     def setRandomMap(self, agents_number, targets_number, obstacles_number):
         self.godmap.setRandomObstables(obstacles_number)
         self.godmap.setRandomTargets(targets_number)
-        self.targets_number = targets_number
         self.agents_number = agents_number
         agents = {}
+        xy_temp = []
         for id in range(0, agents_number):
             x = random.randint(0, self.width - 1)
             y = random.randint(0, self.height - 1)
+            while (x, y) in xy_temp:
+                x = random.randint(0, self.width - 1)
+                y = random.randint(0, self.height - 1)
+
+            xy_temp.append((x, y))
             agent = Agent(id, x, y, self.height, self.width)
             agents[id] = agent
         self.setAgents(agents)
 
-    def setScore(self, acquisition_sum, explored_sum, time_decrease, crash_decrease):
-        #the score calculating standard of the game
-        self.explored_sum = explored_sum
-        self.acquisition_sum = acquisition_sum
-        self.time_decrease = time_decrease
-        self.crash_decrease = crash_decrease
-
-        self.score = 0
-   
-        
     def runOneRound(self, commands):
-        self.state += 1
         for command in commands:
             agent = self.consolemap.agents[command.id]
             agent.move(command.dx, command.dy, self.consolemap)
@@ -100,6 +93,7 @@ class Game():
 
     def outputAgentImage(self, agentId):
         map = np.zeros((self.width, self.height, 3))
+        image = np.zeros((3, self.width, self.height))
         for x in range(0, self.width):
             for y in range(0, self.height):
                 area = self.consolemap.areas[y][x]
@@ -115,7 +109,11 @@ class Game():
                     map[(y, x)] = [0, 0, 0]  # black
                 else:
                     map[(y, x)] = [51, 204, 51]  # green, other agents
-        return map
+
+        for i in range(3):
+            image[i, :, :] = map[:, :, i]
+
+        return image
 
     def outputGodImage(self):
         map = np.zeros((self.width, self.height, 3))
@@ -129,22 +127,6 @@ class Game():
                 elif area is State["obstacle"]:
                     map[(y, x)] = [0, 0, 0]  # black
         return map
-
-    def outputScore(self):
-        counting = 0
-        collected_targets_ratio = 1 - len(self.godmap.targets) / self.targets_number
-        for y in range(0, self.height):
-            for x in range(0, self.width):
-                area = self.consolemap.areas[y][x]
-                if area is not State["emptyWhite"]:
-                    counting += 1
-
-        explored_ratio = 1 - counting / (self.height * self.width)
-
-        score = self.state * self.time_decrease + explored_ratio * self.explored_sum + collected_targets_ratio * self.acquisition_sum
-        #unfinished
-
-        return explored_ratio
 
     def printGodMap(self):
         print("<- God Map ->")
@@ -177,6 +159,14 @@ class Game():
                 else:
                     row += str(area)
             print(row)
+
+    def torchNext(self):
+        bot_observe = [self.outputAgentImage(i) for i in range(self.agents_number)]
+        self.modelGo.observe(bot_observe)
+
+        commands = self.modelGo.action()
+
+        self.runOneRound(commands)
 
     def jsonMap(self):
         return json.dumps(self.consolemap.areas)
