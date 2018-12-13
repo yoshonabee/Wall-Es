@@ -38,16 +38,15 @@ def newGame():
     game = Game(height, width)
     game.setRandomMap(5, int(t*0.4)**2, int(t*0.3)**2)
     game.printGodMap()
-    game.torchNext()
+    game.runOneRoundwithoutMovement()
     game.printConsoleMap()
     return game.jsonMap()
 
 @app.route('/next')
 def next():
     game.torchNext()
-    game.printConsoleMap()
     return game.jsonMap()
 
 # If we're running in stand alone mode, run the application
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0")

@@ -116,7 +116,7 @@
             isRunning = true;
             height = document.getElementById("height").value;
             width = document.getElementById("width").value;
-            fetch(`http://127.0.0.1:5000/newGame?height=${height}&width=${width}`)
+            fetch(`/newGame?height=${height}&width=${width}`)
                 .then(function (response) {
                     return response.json();
                 })
@@ -127,7 +127,7 @@
         }
 
         function play() {
-            fetch(`http://127.0.0.1:5000/next`)
+            fetch(`/next`)
                 .then(function (response) {
                     return response.json();
                 })
