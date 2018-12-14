@@ -37,6 +37,7 @@ def newGame():
     t = (height + width)/2
     game = Game(height, width)
     game.setRandomMap(5, int(t*0.4)**2, int(t*0.3)**2)
+    game.setScore()
     game.printGodMap()
     game.runOneRoundwithoutMovement()
     game.printConsoleMap()

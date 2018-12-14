@@ -14,6 +14,9 @@ class Game():
         self.height = height
         self.width = width
 
+        #initial round of the game
+        self.round = -1
+
         self.modelGo = modelGo()
 
         # godmap will be asked when agent observing
@@ -36,11 +39,17 @@ class Game():
 
     def setTargets(self, targets):
         self.godmap.setTargets(targets)
+        self.targets_number = len(targets)
+
+    def setScore(self, acquired_target_sum = 100, time_decrease = -0.1):
+        self.acquired_target_sum = acquired_target_sum
+        self.time_decrease = time_decrease
 
     def setRandomMap(self, agents_number, targets_number, obstacles_number):
         self.godmap.setRandomObstables(obstacles_number)
         self.godmap.setRandomTargets(targets_number)
         self.agents_number = agents_number
+        self.targets_number = targets_number
         agents = {}
         xy_temp = []
         for id in range(0, agents_number):
@@ -56,6 +65,7 @@ class Game():
         self.setAgents(agents)
 
     def runOneRound(self, commands):
+        self.round += 1
         for command in commands:
             agent = self.consolemap.agents[command.id]
             agent.move(command.dx, command.dy, self.consolemap)
@@ -67,11 +77,16 @@ class Game():
             print("agent%d position:(%d,%d)" %(agent.id,agent.x,agent.y))
         
     def runOneRoundwithoutMovement(self):
+        self.round += 1
         commands = []
         for id in self.consolemap.agents:
             commands.append(Command(id, 0, 0))
         self.runOneRound(commands)
 
+    def getScore(self):
+        collected_targets_ratio = 1 - (len(self.godmap.targets) + len(self.consolemap.targets)) / self.targets_number
+
+        return self.acquired_target_sum * collected_targets_ratio + self.time_decrease * self.round
 
     def printConsoleInfo(self):
         agents = []

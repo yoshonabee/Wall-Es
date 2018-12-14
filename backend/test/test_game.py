@@ -14,6 +14,7 @@ def torchGame():
     t = 128 + 128 / 2
 
     game.setRandomMap(5, int(t * 0.3) ** 2, int(t * 0.1) ** 2)
+    game.setScore()
     # numbers of agents, targets, obstacles
 
     #game.printGodInfo()
@@ -29,6 +30,7 @@ def randomGame():
     print("\n== init random game ==")
     game = Game(20, 20)  # height, width
     game.setRandomMap(3, 3, 4)  # numbers of agents, targets, obstacles
+    game.setScore()
 
     game.printGodInfo()
 
@@ -73,6 +75,7 @@ def manualGame():
         2: Agent(2, 12, 15, height, width),
     }
     game.setAgents(agents)
+    game.setScore()
 
     game.printGodInfo()
 
