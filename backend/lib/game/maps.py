@@ -60,6 +60,11 @@ class GodMap(BaseMap):
         for i in range(0, obstacles_number):
             x = random.randint(0, self.width - 1)
             y = random.randint(0, self.height - 1)
+
+            while self.areas[y][x] != State['emptyWhite']:
+                x = random.randint(0, self.width - 1)
+                y = random.randint(0, self.height - 1)
+
             obstacle = {"x": x, "y": y}
             self.obstacles.append(obstacle)
             self.areas[obstacle["y"]][obstacle["x"]] = State["obstacle"]
@@ -69,10 +74,14 @@ class GodMap(BaseMap):
         for i in range(0, targets_number):
             x = random.randint(0, self.width - 1)
             y = random.randint(0, self.height - 1)
+
+            while self.areas[y][x] != State['emptyWhite']:
+                x = random.randint(0, self.width - 1)
+                y = random.randint(0, self.height - 1)
+
             target = {"x": x, "y": y}
             self.targets.append(target)
             self.areas[target["y"]][target["x"]] = State["target"]
-
 
 """
 The map for console. Collect information from all agents and give information

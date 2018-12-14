@@ -8,13 +8,20 @@
 </head>
 
 <body>
-    Height: <input id="height" type="number" value="20">
-    Width: <input id="width" type="number" value="20">
-    <button onclick="start()" id="start">start new game</button>
+    Height: <input id="height" type="number" value="128">
+    Width: <input id="width" type="number" value="128">
+    <button onclick="start()" id="start">new game</button>
+    <button onclick="stop()" id="stop">stop</button>
+
     <div id="gamemap" style="padding: 20px">
     </div>
 
     <script>
+        let isRunning = false;
+        let game = null;
+        let height = 0;
+        let width = 0;
+
         class Game {
             constructor(id, width, height, size) {
                 this.width = width;
@@ -99,26 +106,44 @@
             update() {
                 this.two.update();
             }
+
+            clear() {
+                this.two.clear();
+            }
         }
 
         function start() {
-            document.getElementById("gamemap").innerHTML = "";
-            const height = document.getElementById("height").value;
-            const width = document.getElementById("width").value;
-            const game = new Game("gamemap", height, width, 600 / height);
-            game.makeGrids();
-            game.update();
-            fetch(`http://127.0.0.1:5000/newGame?height=${height}&width=${width}`)
+            isRunning = true;
+            height = document.getElementById("height").value;
+            width = document.getElementById("width").value;
+            fetch(`/newGame?height=${height}&width=${width}`)
                 .then(function (response) {
                     return response.json();
                 })
                 .then(function (data) {
                     console.log(data);
-                    mapDraw(game, data);
+                    mapDraw(data);
                 });
         }
 
-        function mapDraw(game, areas) {
+        function play() {
+            fetch(`/next`)
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (data) {
+                    console.log(data);
+                    mapDraw(data);
+                });
+        }
+
+        function stop() {
+            isRunning = false;
+        }
+
+        function mapDraw(areas) {
+            document.getElementById("gamemap").innerHTML = "";
+            game = new Game("gamemap", height, width, 1000 / height);
             const agents = [];
             const targets = [];
             const blacks = [];
@@ -156,6 +181,12 @@
             game.setTargets(targets);
             game.setAgents(agents);
             game.update();
+            game.clear();
+            console.log("draw done");
+            if (isRunning) {
+                console.log("next")
+                setTimeout(play, 100);
+            }
         }
     </script>
 </body>

@@ -14,22 +14,53 @@ class Agent:
         self.height = h
         self.width = w
         self.radius = r
+        self.active = True
 
     def move(self, dx, dy, consolemap):
-        x = self.x + dx
-        y = self.y + dy
-        if not ((x >= 0 and x < self.width) and ( y >= 0 and y < self.height)):
-            raise Exception('Move out boundary!')
-        if consolemap.areas[y][x] is State["obstacle"]:
-            raise Exception('Move to obstacle!')
-        consolemap.areas[self.y][self.x] = State["emptyGray"]
-        self.x = x
-        self.y = y
+        if(self.active):
+            try_x = self.x + dx
+            try_y = self.y + dy
+            update_check = True
+            #out of the map check
+            if (try_x < 0 or try_x >= self.width) or (try_y < 0 or try_y >= self.height):
+                self.active = False
+                update_check = False
+                x = self.x
+                y = self.y
+
+            if update_check:
+                #obstacle crash check
+                if consolemap.areas[try_y][try_x] is State["obstacle"]:
+                    self.active = False
+                    update_check = False
+                    x = self.x
+                    y = self.y
+
+                #collision crash check
+                for i in range(len(consolemap.agents)):
+                    if self.id == i:
+                        continue
+                    else:
+                        if try_x == consolemap.agents[i].x and try_y == consolemap.agents[i].y:
+                            self.active = False
+                            consolemap.agents[i].active = False
+                            update_check = False
+                            x = self.x
+                            y = self.y
+                            break
+
+            consolemap.areas[self.y][self.x] = State["emptyGray"]
+
+            if update_check:
+                x = try_x
+                y = try_y
+
+            self.x = x
+            self.y = y
 
     """
     Use GodMap to get the area data in which the agent is observing.
     """
-
     def observe(self, godmap):
         areas = []
         newTargets = []
@@ -58,3 +89,6 @@ class Agent:
                 newObserveAreas.append(area)
                 godmap.areas[area["y"]][area["x"]] = State["emptyGray"]
         return (newObserveAreas, newTargets, newObstacles)
+
+    def state(self):
+        return self.active
