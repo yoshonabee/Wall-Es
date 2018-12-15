@@ -7,43 +7,6 @@ from lib.game.game import Game, Command
 from lib.game.agent import Agent
 
 
-def testManualGameImageOutput1():
-    print("\n== init manual setting game ==")
-    height = 10
-    width = 10
-    game = Game(height, width)
-
-    obstacles = [
-        {"x": 1, "y": 1}, {"x": 2, "y": 2}, {"x": 3, "y": 3}
-    ]
-    targets = [
-        {"x": 4, "y": 4}, {"x": 5, "y": 5}, {"x": 6, "y": 6}
-    ]
-    game.setObstacles(obstacles)
-    game.setTargets(targets)
-    #game.setScore(100, 10, -0.01, -100)
-
-    game.printGodMap()
-
-    agents = {
-        0: Agent(0, 7, 6, height, width, r=3), # id, x, y, height, width
-    }
-    game.setAgents(agents)
-
-    game.printConsoleMap()
-
-    print("\n== 1st round ==")
-    game.runOneRound([Command(0, -1, -1)]) # (6, 5)
-    game.printConsoleMap()
-
-    print("\n== 2st round ==")
-    game.runOneRound([Command(0, -1, 0)]) # (5, 5)
-    game.printConsoleMap()
-
-    print("\n== 3st round ==")
-    game.runOneRound([Command(0, -1, 0)]) #(4, 5)
-    game.printConsoleMap()
-
 def target_agent_len(target,agent):
     return np.sqrt(np.square(target['x'] - agent.x) + np.square(target['y'] - agent.y))
 
@@ -65,36 +28,34 @@ def walk(target,agent):
     print("agent %d goes" % agent.id,x,"and",y)
     return Command(agent.id,x,y)
 
-def no_target_walk(area, agent):
+def no_target_walk(area, agent, height, width):
     direction = [0, 0, 0, 0, 0]
     target = [0, 0, 0, 0, 0]
-    h = agent.height
-    w = agent.width
-    for i in range(0, w): # detect target and unseenspace in four direction for agent 
-        for j in range(0, h):
-            if i > 0 and i < agent.x:
-                if j > 0 and j < agent.y:
+    
+    for i in range(0, width): # detect target and unseenspace in four direction for agent 
+        for j in range(0, height):
+            if i >= 0 and i < agent.x:
+                if j >= 0 and j < agent.y:
                     if area[i][j] == -3:
                         direction[2] += 1
                     if area[i][j] == -2:
                         target[2] += 1
-                elif j >= agent.y and j < w:
+                elif j > agent.y and j < width:
                     if area[i][j] == -3:
                         direction[3] += 1
                     if area[i][j] == -2:
                         target[3] += 1
-            elif i >= agent.x and i < h:
-                if j > 0 and j < agent.y:
+            elif i > agent.x and i < height:
+                if j >= 0 and j < agent.y:
                     if area[i][j] == -3:
                         direction[1] += 1
                     if area[i][j] == -2:
                         target[1] += 1
-                elif j >= agent.y and j < w:
+                elif j > agent.y and j < width:
                     if area[i][j] == -3:
                         direction[4] += 1
                     if area[i][j] == -2:
                         target[4] += 1
-                
      
     ind = -1    
     maximum = 0
@@ -126,16 +87,6 @@ def haveunseenspace(area, height, width):
                 break
     return False
 
-def target_belong(targets, agents): # cluster the target to the agent in the radius of their vision 
-    belongs = []
-    for i in agents:
-        belongs.append([])
-        for target in targets:
-            if target_agent_len(target, agents[i]) < agents[i].radius * 2:
-                belongs[i].append(target)
-                targets.romove(target)
-    return belongs
-    
 def testManualGameImageOutput2():
     print("\n== init manual setting game ==")
     height = 40
@@ -151,7 +102,6 @@ def testManualGameImageOutput2():
     game = Game(height, width)
 
     game.setRandomMap(0, 200, 0) # numbers of agents, targets, obstacles
-    #game.setScore(100, 10, -0.01, -100)
 
 
     game.printGodMap()
@@ -175,15 +125,13 @@ def testManualGameImageOutput2():
         #print("found:",found_target)        
         #print("agent mode",mode)           
         
-        '''for item in found_target: # cluster the target
+        for item in found_target: # cluster the target
             index = 0
             if target_agent_len(item,agents[index])>target_agent_len(item,agents[1]):
                 index = 1
             if target_agent_len(item,agents[index])>target_agent_len(item,agents[2]):
                 index = 2
-            belongs[index].append(item)'''
-        belongs = target_belong(found_target, agents)
-        print(belongs)
+            belongs[index].append(item)
         
         cmd = [] # store the new command for agents 
         
@@ -207,7 +155,7 @@ def testManualGameImageOutput2():
                                  }
             
             if mode[i] == False: # assign the cammand to agent
-                direction = no_target_walk(game.getmap(), agents[i])
+                direction = no_target_walk(game.getmap(), agents[i], height, width)
                 cmd.append(Command(agents[i].id, no_target_command[direction]["dx"],no_target_command[direction]["dy"]))
                 print("agent %d goes" % agents[i].id,no_target_command[direction]["dx"], "and", no_target_command[direction]["dy"])
             elif mode[i] == True:

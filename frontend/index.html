@@ -33,7 +33,13 @@
                     height: this.height * this.size
                 }).appendTo(elem);
             }
-
+            makeBoundary() {
+                const a = this.two.makeLine(0, 0, 0, (this.height - 1) * this.size);
+                const b = this.two.makeLine(0, 0, (this.width -1 ) * this.size, 0);
+                const c = this.two.makeLine(0, (this.height - 1) * this.size,  (this.width -1 ) * this.size, (this.height - 1) * this.size);
+                const d = this.two.makeLine((this.width -1 ) * this.size,0, (this.width -1 ) * this.size, (this.height - 1) * this.size);
+                d.stroke = c.stroke = b.stroke = a.stroke = '#6dcff6';
+            }
             makeGrids() {
                 for (let i = 0; i < this.height; i++) {
                     for (let j = 0; j < this.width; j++) {
@@ -176,7 +182,8 @@
                     }
                 }
             }
-            game.setBlacks(blacks);
+            game.makeBoundary();
+            //game.setBlacks(blacks);
             game.setObstacles(obstacles);
             game.setTargets(targets);
             game.setAgents(agents);
