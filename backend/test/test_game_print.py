@@ -131,9 +131,9 @@ def target_belong(targets, agents): # cluster the target to the agent in the rad
     for i in agents:
         belongs.append([])
         for target in targets:
-            if target_agent_len(target, agents[i]) < agents[i].radius * 2:
+            if target_agent_len(target, agents[i]) < agents[i].radius * 3:
                 belongs[i].append(target)
-                targets.romove(target)
+                #targets.romove(target)
     return belongs
     
 def testManualGameImageOutput2():
@@ -164,7 +164,7 @@ def testManualGameImageOutput2():
     
     game.setAgents(agents)
     ##########
-    game.runOneRound([Command(0, 0, 0), Command(1, 0, 0), Command(2, 0, 0)])
+    game.runOneRoundwithoutMovement()
     game.printConsoleMap()   
     round = 1
     
@@ -175,15 +175,14 @@ def testManualGameImageOutput2():
         #print("found:",found_target)        
         #print("agent mode",mode)           
         
-        '''for item in found_target: # cluster the target
+        for item in found_target: # cluster the target
             index = 0
             if target_agent_len(item,agents[index])>target_agent_len(item,agents[1]):
                 index = 1
             if target_agent_len(item,agents[index])>target_agent_len(item,agents[2]):
                 index = 2
-            belongs[index].append(item)'''
-        belongs = target_belong(found_target, agents)
-        print(belongs)
+            belongs[index].append(item)
+        
         
         cmd = [] # store the new command for agents 
         
