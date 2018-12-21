@@ -10,9 +10,10 @@ from lib.game.agent import Agent
 def target_agent_len(target,agent):
     return np.sqrt(np.square(target['x'] - agent.x) + np.square(target['y'] - agent.y))
 
-def walk(target,agent):
+def walk(target,agent, area):
     x = 0
     y = 0
+    avoid_obstacle = 0
     if (target['x'] - agent.x) > 0:
         x = 1
     elif (target['x'] - agent.x) == 0:
@@ -25,7 +26,11 @@ def walk(target,agent):
         y = 0
     else:
         y = -1
+    
+    (x, y, avoid_obstacle) = avoid_obstacles(agent, area, x, y, avoid_obstacle)
+    
     print("agent %d goes" % agent.id,x,"and",y)
+    print(avoid_obstacle)
     return Command(agent.id,x,y)
 
 def no_target_walk(area, agent):
@@ -33,6 +38,17 @@ def no_target_walk(area, agent):
     target = [0, 0, 0, 0, 0]
     height = agent.height
     width = agent.width
+    no_target_command = { 0: {"dx": 0, "dy": 0}, # no move
+                          1: {"dx": 1, "dy": -1}, # move up-right
+                          2: {"dx": -1, "dy": -1}, # move up-left
+                          3: {"dx": -1, "dy": 1}, # move down-left
+                          4: {"dx": 1, "dy": 1}, # move down-rigth
+                          5: {"dx": 1, "dy": 0}, # move right
+                          6: {"dx": 0, "dy": -1}, # move up
+                          7: {"dx": -1, "dy": 0}, # move left
+                          8: {"dx": 0, "dy": 1}, # move down
+                        }
+    
     for i in range(0, height): # detect target and unseenspace in four direction for agent 
         for j in range(0, width):
             if i >= 0 and i <= agent.y:
@@ -97,7 +113,30 @@ def no_target_walk(area, agent):
                 elif target[k] > maximum:
                     maximum = target[k]
                     ind = k
-    return ind
+    print("agent %d goes" % agent.id,no_target_command[ind]["dx"], "and", no_target_command[ind]["dy"])
+    return Command(agent.id, no_target_command[ind]["dx"],no_target_command[ind]["dy"])
+
+def avoid_obstacles(agent, area, x, y, avoid_obstacle):
+    try_x = agent.x + x
+    try_y  = agent.y + y
+    if area[try_y][try_x] == -1:
+        avoid_obstacle = 1
+
+        if x == 0:
+            if agent.x == agent.width - 1:
+                x = -1
+            else:
+                x = 1
+        else :
+            if y == 0:
+                if agent.y == agent.height - 1:
+                    y = -1
+                else:
+                    y = 1
+            else:
+                y = 0
+    return (x, y, avoid_obstacle)
+    
 
 def haveunseenspace(area, height, width):
     for i in range(0, width):
@@ -107,7 +146,7 @@ def haveunseenspace(area, height, width):
                 break
     return False
 
-def in_mission_field(agents, belongs, game): # cluster the target to the agent in the radius of their vision 
+def in_mission_field(agents, belongs, game): # pick up the target that is in their belonging
     mf = {0: [], 1: [], 2: []}
     for i in agents:
         for target in belongs[i]:
@@ -124,7 +163,7 @@ def in_mission_field(agents, belongs, game): # cluster the target to the agent i
         if mf == belongs and not haveunseenspace(game.consolemap.areas, agents[0].height, agents[0].width):
             return True
 
-def alg_next(round, game, agents, crash):
+def alg_next(round, game, agents, crash): # one round
     
     found_target = []
     mode = {}
@@ -163,28 +202,17 @@ def alg_next(round, game, agents, crash):
                     if target_agent_len(target_list,agents[i]) < target_agent_len(now_target[i],agents[i]):
                         now_target[i] = target_list
         
-        no_target_command = { 0: {"dx": 0, "dy": 0}, # no move
-                             1: {"dx": 1, "dy": -1}, # move up-right
-                             2: {"dx": -1, "dy": -1}, # move up-left
-                             3: {"dx": -1, "dy": 1}, # move down-left
-                             4: {"dx": 1, "dy": 1}, # move down-rigth
-                             5: {"dx": 1, "dy": 0}, # move right
-                             6: {"dx": 0, "dy": -1}, # move up
-                             7: {"dx": -1, "dy": 0}, # move left
-                             8: {"dx": 0, "dy": 1}, # move down
-                             }
         
         if mode[i] == False: # assign the cammand to agent
             if in_mission_field(agents, belongs, game):
                 cmd.append(Command(agents[i].id, 0, 0))
                 print("agent %d goes 0 and 0" % agents[i].id)
             else:
-                direction = no_target_walk(game.getmap(), agents[i])
-                cmd.append(Command(agents[i].id, no_target_command[direction]["dx"],no_target_command[direction]["dy"]))
-                print("agent %d goes" % agents[i].id,no_target_command[direction]["dx"], "and", no_target_command[direction]["dy"])
+                cmd.append(no_target_walk(game.getmap(), agents[i]))
+                
     
         elif mode[i] == True:
-            cmd.append(walk(now_target[i],agents[i]))
+            cmd.append(walk(now_target[i],agents[i], game.getmap()))
             mode[i] = False
         
     game.runOneRound(cmd)
@@ -198,15 +226,14 @@ def alg_next(round, game, agents, crash):
 
 def testManualGameImageOutput2():
     print("\n== init manual setting game ==")
-    height = 40
-    width = 40
+    height = 60
+    width = 60
     crash = 0
-    
     
     
     game = Game(height, width)
 
-    game.setRandomMap(0, 200, 0) # numbers of agents, targets, obstacles
+    game.setRandomMap(0, 800, 200) # numbers of agents, targets, obstacles
 
 
     game.printGodMap()
@@ -229,7 +256,7 @@ def testManualGameImageOutput2():
         crash = alg_next(round, game, agents, crash)
         round += 1
     #print(np.sum(game.consolemap.areas))    
-    print("crush time: %d" %crash)
+    print("crash time: %d" %crash)
     print("finish")
         
 testManualGameImageOutput2()
