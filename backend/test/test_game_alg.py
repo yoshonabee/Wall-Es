@@ -13,7 +13,7 @@ def target_agent_len(target,agent):
 def walk(target,agent, area):
     x = 0
     y = 0
-    avoid_obstacle = 0
+    meet_obstacle = 0
     if (target['x'] - agent.x) > 0:
         x = 1
     elif (target['x'] - agent.x) == 0:
@@ -27,10 +27,9 @@ def walk(target,agent, area):
     else:
         y = -1
     
-    (x, y, avoid_obstacle) = avoid_obstacles(agent, area, x, y, avoid_obstacle)
+    (x, y) = avoid_obstacles(agent, area, x, y, meet_obstacle)
     
     print("agent %d goes" % agent.id,x,"and",y)
-    print(avoid_obstacle)
     return Command(agent.id,x,y)
 
 def no_target_walk(area, agent):
@@ -113,29 +112,35 @@ def no_target_walk(area, agent):
                 elif target[k] > maximum:
                     maximum = target[k]
                     ind = k
-    print("agent %d goes" % agent.id,no_target_command[ind]["dx"], "and", no_target_command[ind]["dy"])
-    return Command(agent.id, no_target_command[ind]["dx"],no_target_command[ind]["dy"])
+    x = no_target_command[ind]["dx"]
+    y = no_target_command[ind]["dy"]
+    print("agent %d goes" % agent.id, no_target_command[ind]["dx"], "and", no_target_command[ind]["dy"])
+    return Command(agent.id, x, y)
 
-def avoid_obstacles(agent, area, x, y, avoid_obstacle):
+def avoid_obstacles(agent, area, x, y, meet_obstacle): #有出界的bug
+    meet_obstacle += 1
     try_x = agent.x + x
     try_y  = agent.y + y
     if area[try_y][try_x] == -1:
-        avoid_obstacle = 1
 
-        if x == 0:
-            if agent.x == agent.width - 1:
-                x = -1
-            else:
-                x = 1
-        else :
-            if y == 0:
-                if agent.y == agent.height - 1:
-                    y = -1
-                else:
-                    y = 1
-            else:
-                y = 0
-    return (x, y, avoid_obstacle)
+        if x < 0:
+            if y < 0: x = 0;
+            elif y == 0: y = -1;
+            elif y > 0: y = 0;
+        elif x == 0:
+            if y < 0: x = 1;
+            elif y > 0: x = -1;
+        elif x > 0:
+            if y < 0: y = 0;
+            elif y == 0: y = 1;
+            elif y > 0: x = 0;
+                
+       
+        if meet_obstacle < 9:
+            (x, y) = avoid_obstacles(agent, area, x, y, meet_obstacle)
+        else:
+            return (0, 0)
+    return (x, y)
     
 
 def haveunseenspace(area, height, width):
@@ -226,14 +231,14 @@ def alg_next(round, game, agents, crash): # one round
 
 def testManualGameImageOutput2():
     print("\n== init manual setting game ==")
-    height = 60
-    width = 60
+    height = 40
+    width = 40
     crash = 0
     
     
     game = Game(height, width)
 
-    game.setRandomMap(0, 800, 200) # numbers of agents, targets, obstacles
+    game.setRandomMap(0, 200, 80) # numbers of agents, targets, obstacles
 
 
     game.printGodMap()
@@ -242,7 +247,7 @@ def testManualGameImageOutput2():
         0: Agent(0, 0, 0, height, width, r=5), # id, x, y, height, width
         1: Agent(1, width-1 , 0, height, width, r=5), # id, x, y, height, width
         2: Agent(2, 0 , height-1 , height, width, r=5), # id, x, y, height, width
-        3: Agent(3, width - 1, height- 1, height, width, r = 5)
+        #3: Agent(3, width - 1, height- 1, height, width, r = 5)
     }
     
     game.setAgents(agents)
@@ -251,8 +256,8 @@ def testManualGameImageOutput2():
     game.printConsoleMap()   
     round = 1
     
-    while(game.consolemap.targets != [] or haveunseenspace(game.consolemap.areas, height, width)):
-    #for round in range(1, 180):
+    #while(game.consolemap.targets != [] or haveunseenspace(game.consolemap.areas, height, width)):
+    for round in range(1, 200):
         crash = alg_next(round, game, agents, crash)
         round += 1
     #print(np.sum(game.consolemap.areas))    
