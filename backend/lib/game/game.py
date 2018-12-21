@@ -60,7 +60,7 @@ class Game():
                 y = random.randint(0, self.height - 1)
 
             xy_temp.append((x, y))
-            agent = Agent(id, x, y, self.height, self.width)
+            agent = Agent(id, y, x, self.height, self.width)
             agents[id] = agent
         self.setAgents(agents)
 

@@ -124,17 +124,85 @@ def in_mission_field(agents, belongs, game): # cluster the target to the agent i
         if mf == belongs and not haveunseenspace(game.consolemap.areas, agents[0].height, agents[0].width):
             return True
 
+def alg_next(round, game, agents, crash):
+    
+    found_target = []
+    mode = {}
+    now_target = {}
+    belongs = {}
+    for id in agents:
+        mode[id] = False # agents' mode True if agent has target rightnow 
+        now_target[id] = []  
+        belongs[id] = []
+    
+    print("====the %d round" % round)
+        
+    found_target = game.consolemap.targets
+        
+    for item in found_target: # cluster the target
+        index = 0
+        if target_agent_len(item,agents[index])>target_agent_len(item,agents[1]):
+            index = 1
+        if target_agent_len(item,agents[index])>target_agent_len(item,agents[2]):
+            index = 2
+        belongs[index].append(item)
+        
+    #belongs = target_belong(found_target, agents)
+        
+    cmd = [] # store the new command for agents 
+        
+    for i in agents:
+    
+        if mode[i] == False: # assign a target to agent 
+            now_target[i] = []
+            for target_list in belongs[i]:
+                if now_target[i] == [] and target_list != []:
+                    now_target[i] = target_list
+                    mode[i] = True
+                else:
+                    if target_agent_len(target_list,agents[i]) < target_agent_len(now_target[i],agents[i]):
+                        now_target[i] = target_list
+        
+        no_target_command = { 0: {"dx": 0, "dy": 0}, # no move
+                             1: {"dx": 1, "dy": -1}, # move up-right
+                             2: {"dx": -1, "dy": -1}, # move up-left
+                             3: {"dx": -1, "dy": 1}, # move down-left
+                             4: {"dx": 1, "dy": 1}, # move down-rigth
+                             5: {"dx": 1, "dy": 0}, # move right
+                             6: {"dx": 0, "dy": -1}, # move up
+                             7: {"dx": -1, "dy": 0}, # move left
+                             8: {"dx": 0, "dy": 1}, # move down
+                             }
+        
+        if mode[i] == False: # assign the cammand to agent
+            if in_mission_field(agents, belongs, game):
+                cmd.append(Command(agents[i].id, 0, 0))
+                print("agent %d goes 0 and 0" % agents[i].id)
+            else:
+                direction = no_target_walk(game.getmap(), agents[i])
+                cmd.append(Command(agents[i].id, no_target_command[direction]["dx"],no_target_command[direction]["dy"]))
+                print("agent %d goes" % agents[i].id,no_target_command[direction]["dx"], "and", no_target_command[direction]["dy"])
+    
+        elif mode[i] == True:
+            cmd.append(walk(now_target[i],agents[i]))
+            mode[i] = False
+        
+    game.runOneRound(cmd)
+    game.printConsoleMap()
+    for i in agents: #calculate crash time
+        for j in range(i + 1, len(agents)):
+            if agents[i].x == agents[j].x and agents[i].y == agents[j].y:
+                crash += 1
+    #print(found_target)
+    return crash
+
 def testManualGameImageOutput2():
     print("\n== init manual setting game ==")
     height = 40
     width = 40
     crash = 0
     
-    mode ={0:False,1:False,2:False} #agents' mode True if agent has target rightnow
-    found_target = []    
-    now_target = {0:[],1:[],2:[]}    
-    belongs = {0:[],1:[],2:[]}
-    cmd = []
+    
     
     game = Game(height, width)
 
@@ -146,7 +214,8 @@ def testManualGameImageOutput2():
     agents = {
         0: Agent(0, 0, 0, height, width, r=5), # id, x, y, height, width
         1: Agent(1, width-1 , 0, height, width, r=5), # id, x, y, height, width
-        2: Agent(2, int(width/2) , height-1 , height, width, r=5), # id, x, y, height, width
+        2: Agent(2, 0 , height-1 , height, width, r=5), # id, x, y, height, width
+        3: Agent(3, width - 1, height- 1, height, width, r = 5)
     }
     
     game.setAgents(agents)
@@ -157,67 +226,7 @@ def testManualGameImageOutput2():
     
     while(game.consolemap.targets != [] or haveunseenspace(game.consolemap.areas, height, width)):
     #for round in range(1, 180):
-        print("====the %d round" % round)
-        
-        found_target = game.consolemap.targets
-        
-        for item in found_target: # cluster the target
-            index = 0
-            if target_agent_len(item,agents[index])>target_agent_len(item,agents[1]):
-                index = 1
-            if target_agent_len(item,agents[index])>target_agent_len(item,agents[2]):
-                index = 2
-            belongs[index].append(item)
-        
-        #belongs = target_belong(found_target, agents)
-        
-        cmd = [] # store the new command for agents 
-        
-        for i in agents:
-            
-            if mode[i] == False: # assign a target to agent 
-                now_target[i] = []
-                for target_list in belongs[i]:
-                    if now_target[i] == [] and target_list != []:
-                        now_target[i] = target_list
-                        mode[i] = True
-                    else:
-                        if target_agent_len(target_list,agents[i]) < target_agent_len(now_target[i],agents[i]):
-                            now_target[i] = target_list
-            
-            no_target_command = { 0: {"dx": 0, "dy": 0}, # no move
-                                  1: {"dx": 1, "dy": -1}, # move up-right
-                                  2: {"dx": -1, "dy": -1}, # move up-left
-                                  3: {"dx": -1, "dy": 1}, # move down-left
-                                  4: {"dx": 1, "dy": 1}, # move down-rigth
-                                  5: {"dx": 1, "dy": 0}, # move right
-                                  6: {"dx": 0, "dy": -1}, # move up
-                                  7: {"dx": -1, "dy": 0}, # move left
-                                  8: {"dx": 0, "dy": 1}, # move down
-                                 }
-            
-            if mode[i] == False: # assign the cammand to agent
-                if in_mission_field(agents, belongs, game):
-                    cmd.append(Command(agents[i].id, 0, 0))
-                    print("agent %d goes 0 and 0" % agents[i].id)
-                else:
-                    direction = no_target_walk(game.getmap(), agents[i])
-                    cmd.append(Command(agents[i].id, no_target_command[direction]["dx"],no_target_command[direction]["dy"]))
-                    print("agent %d goes" % agents[i].id,no_target_command[direction]["dx"], "and", no_target_command[direction]["dy"])
-            
-            elif mode[i] == True:
-                cmd.append(walk(now_target[i],agents[i]))
-                mode[i] = False
-        
-        game.runOneRound(cmd)
-        game.printConsoleMap()
-        for i in agents: #calculate crash time
-            for j in range(i + 1, len(agents)):
-                if agents[i].x == agents[j].x and agents[i].y == agents[j].y:
-                    crash += 1
-        #print(found_target)
-        
-        belongs = {0:[],1:[],2:[]}
+        crash = alg_next(round, game, agents, crash)
         round += 1
     #print(np.sum(game.consolemap.areas))    
     print("crush time: %d" %crash)
