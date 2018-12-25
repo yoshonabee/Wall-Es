@@ -11,9 +11,7 @@ def target_agent_len(target,agent):
     return np.sqrt(np.square(target['x'] - agent.x) + np.square(target['y'] - agent.y))
 
 def walk(target,agent, area):
-    x = 0
-    y = 0
-    meet_obstacle = 0
+    
     if (target['x'] - agent.x) > 0:
         x = 1
     elif (target['x'] - agent.x) == 0:
@@ -27,8 +25,7 @@ def walk(target,agent, area):
     else:
         y = -1
     
-    (x, y) = avoid_obstacles(agent, area, x, y, meet_obstacle)
-    
+    (x, y) = avoid_obstacles(agent, area, x, y)
     print("agent %d goes" % agent.id,x,"and",y)
     return Command(agent.id,x,y)
 
@@ -37,16 +34,16 @@ def no_target_walk(area, agent):
     target = [0, 0, 0, 0, 0]
     height = agent.height
     width = agent.width
-    no_target_command = { 0: {"dx": 0, "dy": 0}, # no move
-                          1: {"dx": 1, "dy": -1}, # move up-right
-                          2: {"dx": -1, "dy": -1}, # move up-left
-                          3: {"dx": -1, "dy": 1}, # move down-left
-                          4: {"dx": 1, "dy": 1}, # move down-rigth
-                          5: {"dx": 1, "dy": 0}, # move right
-                          6: {"dx": 0, "dy": -1}, # move up
-                          7: {"dx": -1, "dy": 0}, # move left
-                          8: {"dx": 0, "dy": 1}, # move down
-                        }
+    command = { 0: {"dx": 0, "dy": 0}, # no move
+                1: {"dx": 1, "dy": -1}, # move up-right
+                2: {"dx": -1, "dy": -1}, # move up-left
+                3: {"dx": -1, "dy": 1}, # move down-left
+                4: {"dx": 1, "dy": 1}, # move down-rigth
+                5: {"dx": 1, "dy": 0}, # move right
+                6: {"dx": 0, "dy": -1}, # move up
+                7: {"dx": -1, "dy": 0}, # move left
+                8: {"dx": 0, "dy": 1}, # move down
+               }
     
     for i in range(0, height): # detect target and unseenspace in four direction for agent 
         for j in range(0, width):
@@ -112,40 +109,60 @@ def no_target_walk(area, agent):
                 elif target[k] > maximum:
                     maximum = target[k]
                     ind = k
-    x = no_target_command[ind]["dx"]
-    y = no_target_command[ind]["dy"]
-    print("agent %d goes" % agent.id, no_target_command[ind]["dx"], "and", no_target_command[ind]["dy"])
+    x = command[ind]["dx"]
+    y = command[ind]["dy"]
+    (x, y) = avoid_obstacles(agent, area, x, y)
+
+    print("agent %d goes" % agent.id, x, "and", y)
     return Command(agent.id, x, y)
 
-def avoid_obstacles(agent, area, x, y, meet_obstacle): #有出界的bug
-    meet_obstacle += 1
+def avoid_obstacles(agent, area, x, y): #有出界的bug
+    command = { 0: {"dx": 0, "dy": 0}, # no move
+                1: {"dx": 1, "dy": 0}, # move up-right
+                2: {"dx": 1, "dy": -1}, # move up-left
+                3: {"dx": 0, "dy": -1}, # move down-left
+                4: {"dx": -1, "dy": -1}, # move down-rigth
+                5: {"dx": -1, "dy": 0}, # move right
+                6: {"dx": -1, "dy": 1}, # move up
+                7: {"dx": 0, "dy": 1}, # move left
+                8: {"dx": 1, "dy": 1}, # move down
+               }
+    
+    for i in command:
+        if x == command[i]["dx"] and y == command[i]["dy"]:
+            ind = i
+        
     try_x = agent.x + x
     try_y  = agent.y + y
-    if area[try_y][try_x] == -1:
+    indlist = []
+    if (try_x >= 0 and try_x < agent.width) and (try_y >= 0 and try_y < agent.height):
+        if area[try_y][try_x] == -1:
+            for i in range(1, 8):
+                n_ind = ind - i
+                if n_ind < 0:
+                    n_ind = np.abs((n_ind - 1) % 9)
+                try_x = agent.x + command[n_ind]["dx"]
+                try_y = agent.y + command[n_ind]["dy"]
+                if (try_x >= 0 and try_x < agent.width) and (try_y >= 0 and try_y < agent.height):
+                    if not area[try_y][try_x] == -1:
+                        indlist.append(n_ind)    
+            
+            if len(indlist) == 0:
+                ind = 0
+            else:
+                min = 8
+                for i in range(0, len(indlist)):
+                    if np.abs(ind - indlist[i]) < min:
+                        min = np.abs(ind - indlist[i])
+                        n_ind = indlist[i]
+                ind = n_ind
+            
+    return (command[ind]["dx"], command[ind]["dy"])
 
-        if x < 0:
-            if y < 0: x = 0;
-            elif y == 0: y = -1;
-            elif y > 0: y = 0;
-        elif x == 0:
-            if y < 0: x = 1;
-            elif y > 0: x = -1;
-        elif x > 0:
-            if y < 0: y = 0;
-            elif y == 0: y = 1;
-            elif y > 0: x = 0;
-                
-       
-        if meet_obstacle < 9:
-            (x, y) = avoid_obstacles(agent, area, x, y, meet_obstacle)
-        else:
-            return (0, 0)
-    return (x, y)
-    
 
 def haveunseenspace(area, height, width):
-    for i in range(0, width):
-        for j in range(0, height):
+    for i in range(0, len(area)):
+        for j in range(0, len(area[0])):
             if area[i][j] == -3:
                 return True
                 break
@@ -238,7 +255,7 @@ def testManualGameImageOutput2():
     
     game = Game(height, width)
 
-    game.setRandomMap(0, 200, 80) # numbers of agents, targets, obstacles
+    game.setRandomMap(0, 150, 30) # numbers of agents, targets, obstacles
 
 
     game.printGodMap()
@@ -257,7 +274,7 @@ def testManualGameImageOutput2():
     round = 1
     
     #while(game.consolemap.targets != [] or haveunseenspace(game.consolemap.areas, height, width)):
-    for round in range(1, 200):
+    for round in range(1, 250):
         crash = alg_next(round, game, agents, crash)
         round += 1
     #print(np.sum(game.consolemap.areas))    

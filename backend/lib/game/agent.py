@@ -22,7 +22,7 @@ class Agent:
             try_y = self.y + dy
             update_check = True
             #out of the map check
-            if (try_x < 0 or try_x >= self.height) or (try_y < 0 or try_y >= self.width):
+            '''if (try_x < 0 or try_x >= self.height) or (try_y < 0 or try_y >= self.width):
                 self.active = False
                 update_check = False
                 x = self.x
@@ -48,7 +48,7 @@ class Agent:
                             x = self.x
                             y = self.y
                             break
-
+'''
             consolemap.areas[self.y][self.x] = State["emptyGray"]
 
             if update_check:
