@@ -11,7 +11,7 @@ def target_agent_len(target,agent):
     return np.sqrt(np.square(target['x'] - agent.x) + np.square(target['y'] - agent.y))
 
 def walk(target,agent, area):
-    
+    print('a')
     if (target['x'] - agent.x) > 0:
         x = 1
     elif (target['x'] - agent.x) == 0:
@@ -30,6 +30,7 @@ def walk(target,agent, area):
     return Command(agent.id,x,y)
 
 def no_target_walk(area, agent):
+    print('b')
     direction = [0, 0, 0, 0, 0]
     target = [0, 0, 0, 0, 0]
     height = agent.height
@@ -131,22 +132,38 @@ def avoid_obstacles(agent, area, x, y): #有出界的bug
     for i in command:
         if x == command[i]["dx"] and y == command[i]["dy"]:
             ind = i
-        
+    
     try_x = agent.x + x
     try_y  = agent.y + y
     indlist = []
     if (try_x >= 0 and try_x < agent.width) and (try_y >= 0 and try_y < agent.height):
         if area[try_y][try_x] == -1:
-            for i in range(1, 8):
+            print('c')
+            for i in range(1, 5):
                 n_ind = ind - i
-                if n_ind < 0:
-                    n_ind = np.abs((n_ind - 1) % 9)
-                try_x = agent.x + command[n_ind]["dx"]
-                try_y = agent.y + command[n_ind]["dy"]
+                if n_ind <= 0:
+                    fix_ind = np.abs((n_ind - 1) % 9)
+                    try_x = agent.x + command[fix_ind]["dx"]
+                    try_y = agent.y + command[fix_ind]["dy"]
+                else:
+                    try_x = agent.x + command[n_ind]["dx"]
+                    try_y = agent.y + command[n_ind]["dy"] 
                 if (try_x >= 0 and try_x < agent.width) and (try_y >= 0 and try_y < agent.height):
                     if not area[try_y][try_x] == -1:
                         indlist.append(n_ind)    
-            
+            for i in range(1, 5):
+                n_ind = ind + i
+                if n_ind > 8:
+                    fix_ind = np.abs(n_ind % 8)
+                    try_x = agent.x + command[fix_ind]["dx"]
+                    try_y = agent.y + command[fix_ind]["dy"]
+                else:
+                    try_x = agent.x + command[n_ind]["dx"]
+                    try_y = agent.y + command[n_ind]["dy"] 
+                if (try_x >= 0 and try_x < agent.width) and (try_y >= 0 and try_y < agent.height):
+                    if not area[try_y][try_x] == -1:
+                        indlist.append(n_ind)    
+            print(indlist)
             if len(indlist) == 0:
                 ind = 0
             else:
@@ -155,8 +172,13 @@ def avoid_obstacles(agent, area, x, y): #有出界的bug
                     if np.abs(ind - indlist[i]) < min:
                         min = np.abs(ind - indlist[i])
                         n_ind = indlist[i]
-                ind = n_ind
-            
+                if n_ind <= 0:
+                    ind = np.abs((n_ind - 1) % 9)
+                elif n_ind > 8:
+                    ind = np.abs(n_ind % 8)
+                else:
+                    ind = n_ind
+    print(ind)
     return (command[ind]["dx"], command[ind]["dy"])
 
 
@@ -227,6 +249,7 @@ def alg_next(round, game, agents, crash): # one round
         
         if mode[i] == False: # assign the cammand to agent
             if in_mission_field(agents, belongs, game):
+                print('d')
                 cmd.append(Command(agents[i].id, 0, 0))
                 print("agent %d goes 0 and 0" % agents[i].id)
             else:
@@ -255,7 +278,7 @@ def testManualGameImageOutput2():
     
     game = Game(height, width)
 
-    game.setRandomMap(0, 150, 30) # numbers of agents, targets, obstacles
+    game.setRandomMap(0, 300, 50) # numbers of agents, targets, obstacles
 
 
     game.printGodMap()
@@ -273,8 +296,8 @@ def testManualGameImageOutput2():
     game.printConsoleMap()   
     round = 1
     
-    #while(game.consolemap.targets != [] or haveunseenspace(game.consolemap.areas, height, width)):
-    for round in range(1, 250):
+    while(game.consolemap.targets != [] or haveunseenspace(game.consolemap.areas, height, width)):
+    #for round in range(1, 250):
         crash = alg_next(round, game, agents, crash)
         round += 1
     #print(np.sum(game.consolemap.areas))    
