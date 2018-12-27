@@ -12,6 +12,8 @@
     Width: <input id="width" type="number" value="128">
     <button onclick="start()" id="start">new game</button>
     <button onclick="stop()" id="stop">stop</button>
+    <!-- <button onclick="change()" id="change">Change</button> -->
+
 
     <div id="gamemap" style="padding: 20px">
     </div>
@@ -183,7 +185,7 @@
                 }
             }
             game.makeBoundary();
-            //game.setBlacks(blacks);
+            // game.setBlacks(blacks);
             game.setObstacles(obstacles);
             game.setTargets(targets);
             game.setAgents(agents);

@@ -45,7 +45,7 @@ def newGame():
 
 @app.route('/next')
 def next():
-    game.torchNext()
+    game.algNext()
     return game.jsonMap()
 
 # If we're running in stand alone mode, run the application
