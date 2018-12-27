@@ -1,5 +1,6 @@
 from lib.game.maps import GodMap, ConsoleMap, State
 from lib.game.agent import Agent
+from lib.algorithmn.alg1 import haveunseenspace, alg_next
 
 from lib.torch.model import ActorCritic
 from lib.torch.modelGo import modelGo
@@ -182,6 +183,14 @@ class Game():
         commands = self.modelGo.action()
 
         self.runOneRound(commands)
+
+    def algNext(self):
+        crash = 1 # FIX IT
+        if(self.consolemap.targets != [] or haveunseenspace(self.consolemap.areas, self.height, self.width)):
+            crash = alg_next(round, self, self.consolemap.agents, crash)
+            return True
+        else:
+            return False
 
     def jsonMap(self):
         return json.dumps(self.consolemap.areas)

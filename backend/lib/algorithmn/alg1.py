@@ -1,11 +1,10 @@
-import sys
-import os
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 import numpy as np
 
-from lib.game.game import Game, Command
-from lib.game.agent import Agent
-
+class Command():
+    def __init__(self, id, dx, dy):
+        self.id = id
+        self.dx = dx
+        self.dy = dy
 
 def target_agent_len(target,agent):
     return np.sqrt(np.square(target['x'] - agent.x) + np.square(target['y'] - agent.y))
@@ -218,7 +217,7 @@ def alg_next(round, game, agents, crash): # one round
         now_target[id] = []  
         belongs[id] = []
     
-    print("====the %d round" % round)
+    # print("====the %d round" % round)
         
     found_target = game.consolemap.targets
         

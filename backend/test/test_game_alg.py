@@ -5,7 +5,6 @@ import numpy as np
 
 from lib.game.game import Game, Command
 from lib.game.agent import Agent
-from lib.algorithmn.alg1 import haveunseenspace, alg_next
 
 
 def testManualGameImageOutput2():
@@ -35,10 +34,8 @@ def testManualGameImageOutput2():
     game.printConsoleMap()   
     round = 1
     
-    while(game.consolemap.targets != [] or haveunseenspace(game.consolemap.areas, height, width)):
-    #for round in range(1, 250):
-        crash = alg_next(round, game, agents, crash)
-        round += 1
+    while(game.algNext()):
+        pass
     #print(np.sum(game.consolemap.areas))    
     print("crash time: %d" %crash)
     print("finish")
