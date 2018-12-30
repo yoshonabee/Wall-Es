@@ -1,5 +1,7 @@
 import numpy as np
 import lib.algorithmn.TSBTEST as TB
+from ortools.constraint_solver import pywrapcp
+from ortools.constraint_solver import routing_enums_pb2
 class Command():
 	def __init__(self, id, dx, dy):
 		self.id = id
@@ -216,8 +218,8 @@ def alg_next(round, game, agents, crash): # one round
 		mode[id] = False # agents' mode True if agent has target rightnow 
 		now_target[id] = []  
 		belongs[id] = []
-	
-	# print("====the %d round" % round)
+	#print(round)
+    #print("====the %d round" % round)
 		
 	found_target = game.consolemap.targets
 		
@@ -236,9 +238,10 @@ def alg_next(round, game, agents, crash): # one round
 	for i in agents:
 	
 		if mode[i] == False: # assign a target to agent 
-			out = TB.findpath(belongs[i])
-			now_target[i] = belongs[i][out]
-			mode[i] = True
+			if len(belongs[i]) != 0:           
+				out = TB.findpath(belongs[i])
+				now_target[i] = belongs[i][out]
+				mode[i] = True
 			'''for target_list in belongs[i]:
 				if now_target[i] == [] and target_list != []:
 					now_target[i] = target_list

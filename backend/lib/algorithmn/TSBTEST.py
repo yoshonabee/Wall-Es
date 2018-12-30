@@ -1,5 +1,6 @@
 import math
 
+
 from ortools.constraint_solver import pywrapcp
 from ortools.constraint_solver import routing_enums_pb2
 def euclid_distance(x1, y1, x2, y2):
@@ -47,7 +48,7 @@ def findpath(targets):
 		if assignment:
 
 			# Solution cost.
-			print ("Total distance: " + str(assignment.ObjectiveValue()) + "\n")
+			#print ("Total distance: " + str(assignment.ObjectiveValue()) + "\n")
 
 			# Inspect solution.
 			# Only one route here; otherwise iterate from 0 to routing.vehicles() - 1.
@@ -70,7 +71,7 @@ def findpath(targets):
 			print ('No solution found.')
 	else:
 		print ('Specify an instance greater than 0.')
-
+	#print ("Route:\n\n" + str(route))
 	return out
 def create_data_array():
 	locations = [{'x':12,'y':20},{'x':0,'y':0},{'x':30,'y':20},{'x':12,'y':50}]
@@ -78,4 +79,4 @@ def create_data_array():
 	return locations
 
 '''if __name__ == '__main__':
-	main()'''	
+	findpath(create_data_array())'''
