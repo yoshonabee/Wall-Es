@@ -13,7 +13,6 @@ def testManualGameImageOutput2():
     width = 40
     crash = 0
     
-    
     game = Game(height, width)
 
     game.setRandomMap(0, 300, 50) # numbers of agents, targets, obstacles
@@ -33,12 +32,8 @@ def testManualGameImageOutput2():
     game.runOneRoundwithoutMovement()
     game.printConsoleMap()   
     round = 1
-    
-    while(game.algNext()):
+    while(game.algNext(crash, round)):
         pass
-    #print(np.sum(game.consolemap.areas))    
-    print("crash time: %d" %crash)
-    print("finish")
         
 testManualGameImageOutput2()
 

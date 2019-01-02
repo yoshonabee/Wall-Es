@@ -32,8 +32,8 @@ def walk(target,agent, area):
 
 def no_target_walk(area, agent):
 	print('b')
-	direction = [0, 0, 0, 0, 0]
-	target = [0, 0, 0, 0, 0]
+	direction = [-100, 0, 0, 0, 0]
+	target = [-100, 0, 0, 0, 0]
 	height = agent.height
 	width = agent.width
 	command = { 0: {"dx": 0, "dy": 0}, # no move
@@ -55,22 +55,34 @@ def no_target_walk(area, agent):
 						direction[2] += 1
 					if area[i][j] == -2:
 						target[2] += 1
+                    if area[i][j] > 0:
+                        direction[2] -= 20
+                        target[2] -= 20
 				if j >= agent.x:
 					if area[i][j] == -3:
 						direction[1] += 1
 					if area[i][j] == -2:
 						target[1] += 1
+                    if area[i][j] > 0:
+                        direction[1] -= 20
+                        target[1] -= 20
 			if i >= agent.y:
 				if j >= 0 and j <= agent.x:
 					if area[i][j] == -3:
 						direction[3] += 1
 					if area[i][j] == -2:
 						target[3] += 1
+                    if area[i][j] > 0:
+                        direction[3] -= 20
+                        target[3] -= 20
 				if j >= agent.x:
 					if area[i][j] == -3:
 						direction[4] += 1
 					if area[i][j] == -2:
 						target[4] += 1
+                    if area[i][j] > 0:
+                        direction[4] -= 20
+                        target[4] -= 20
 	ind = -1    
 	maximum = 0
 	if np.sum(direction) != 0:
@@ -138,7 +150,7 @@ def avoid_obstacles(agent, area, x, y): #有出界的bug
 	try_y  = agent.y + y
 	indlist = []
 	if (try_x >= 0 and try_x < agent.width) and (try_y >= 0 and try_y < agent.height):
-		if area[try_y][try_x] == -1:
+		if area[try_y][try_x] == -1 or area[try_y][try_x] > 0:
 			print('c')
 			for i in range(1, 5):
 				n_ind = ind - i
@@ -150,7 +162,7 @@ def avoid_obstacles(agent, area, x, y): #有出界的bug
 					try_x = agent.x + command[n_ind]["dx"]
 					try_y = agent.y + command[n_ind]["dy"] 
 				if (try_x >= 0 and try_x < agent.width) and (try_y >= 0 and try_y < agent.height):
-					if not area[try_y][try_x] == -1:
+					if not (area[try_y][try_x] == -1 or area[try_y][try_x] > 0):
 						indlist.append(n_ind)    
 			for i in range(1, 5):
 				n_ind = ind + i
@@ -162,7 +174,7 @@ def avoid_obstacles(agent, area, x, y): #有出界的bug
 					try_x = agent.x + command[n_ind]["dx"]
 					try_y = agent.y + command[n_ind]["dy"] 
 				if (try_x >= 0 and try_x < agent.width) and (try_y >= 0 and try_y < agent.height):
-					if not area[try_y][try_x] == -1:
+					if not (area[try_y][try_x] == -1 or area[try_y][try_x] > 0):
 						indlist.append(n_ind)    
 			print(indlist)
 			if len(indlist) == 0:
@@ -219,7 +231,7 @@ def alg_next(round, game, agents, crash): # one round
 		now_target[id] = []  
 		belongs[id] = []
 	#print(round)
-    #print("====the %d round" % round)
+    print("====the %d round" % round)
 		
 	found_target = game.consolemap.targets
 		
@@ -266,9 +278,11 @@ def alg_next(round, game, agents, crash): # one round
 		
 	game.runOneRound(cmd)
 	game.printConsoleMap()
-	for i in agents: #calculate crash time
+	
+    #calculate crash time
+    for i in agents:
 		for j in range(i + 1, len(agents)):
 			if agents[i].x == agents[j].x and agents[i].y == agents[j].y:
 				crash += 1
-	#print(found_target)
+	round == 1
 	return crash

@@ -184,12 +184,13 @@ class Game():
 
         self.runOneRound(commands)
 
-    def algNext(self):
-        crash = 1 # FIX IT
+    def algNext(self, crash, round):
         if(self.consolemap.targets != [] or haveunseenspace(self.consolemap.areas, self.height, self.width)):
             crash = alg_next(round, self, self.consolemap.agents, crash)
             return True
         else:
+            print("crash time: %d" %crash)
+            print("finish")
             return False
 
     def jsonMap(self):
