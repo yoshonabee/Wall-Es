@@ -1,7 +1,7 @@
 import numpy as np
-import lib.algorithmn.TSBTEST as TB
-from ortools.constraint_solver import pywrapcp
-from ortools.constraint_solver import routing_enums_pb2
+#import lib.algorithmn.TSBTEST as TB
+#from ortools.constraint_solver import pywrapcp
+#from ortools.constraint_solver import routing_enums_pb2
 class Command():
 	def __init__(self, id, dx, dy):
 		self.id = id
@@ -55,34 +55,34 @@ def no_target_walk(area, agent):
 						direction[2] += 1
 					if area[i][j] == -2:
 						target[2] += 1
-                    if area[i][j] > 0:
-                        direction[2] -= 20
-                        target[2] -= 20
+					if area[i][j] > 0 and area[i][j] != agent.id:
+						direction[2] -= 20
+						target[2] -= 20
 				if j >= agent.x:
 					if area[i][j] == -3:
 						direction[1] += 1
 					if area[i][j] == -2:
 						target[1] += 1
-                    if area[i][j] > 0:
-                        direction[1] -= 20
-                        target[1] -= 20
+					if area[i][j] > 0 and area[i][j] != agent.id:
+						direction[1] -= 20
+						target[1] -= 20
 			if i >= agent.y:
 				if j >= 0 and j <= agent.x:
 					if area[i][j] == -3:
 						direction[3] += 1
 					if area[i][j] == -2:
 						target[3] += 1
-                    if area[i][j] > 0:
-                        direction[3] -= 20
-                        target[3] -= 20
+					if area[i][j] > 0 and area[i][j] != agent.id:
+						direction[3] -= 20
+						target[3] -= 20
 				if j >= agent.x:
 					if area[i][j] == -3:
 						direction[4] += 1
 					if area[i][j] == -2:
 						target[4] += 1
-                    if area[i][j] > 0:
-                        direction[4] -= 20
-                        target[4] -= 20
+					if area[i][j] > 0 and area[i][j] != agent.id:
+						direction[4] -= 20
+						target[4] -= 20
 	ind = -1    
 	maximum = 0
 	if np.sum(direction) != 0:
@@ -99,7 +99,7 @@ def no_target_walk(area, agent):
 				if ind == -1:
 					maximum = direction[0]
 					ind = 0
-				elif direction[k] > maximum:
+				elif direction[k] > maximum and direction[k] != 0:
 					maximum = direction[k]
 					ind = k
 			
@@ -231,7 +231,7 @@ def alg_next(round, game, agents, crash): # one round
 		now_target[id] = []  
 		belongs[id] = []
 	#print(round)
-    print("====the %d round" % round)
+	print("====the %d round" % round)
 		
 	found_target = game.consolemap.targets
 		
@@ -250,17 +250,17 @@ def alg_next(round, game, agents, crash): # one round
 	for i in agents:
 	
 		if mode[i] == False: # assign a target to agent 
-			if len(belongs[i]) != 0:           
+			'''if len(belongs[i]) != 0:           
 				out = TB.findpath(belongs[i])
 				now_target[i] = belongs[i][out]
-				mode[i] = True
-			'''for target_list in belongs[i]:
+				mode[i] = True'''
+			for target_list in belongs[i]:
 				if now_target[i] == [] and target_list != []:
 					now_target[i] = target_list
 					mode[i] = True
 				else:
 					if target_agent_len(target_list,agents[i]) < target_agent_len(now_target[i],agents[i]):
-						now_target[i] = target_list'''
+						now_target[i] = target_list
 		
 		
 		if mode[i] == False: # assign the cammand to agent
@@ -280,9 +280,8 @@ def alg_next(round, game, agents, crash): # one round
 	game.printConsoleMap()
 	
     #calculate crash time
-    for i in agents:
+	for i in agents:
 		for j in range(i + 1, len(agents)):
 			if agents[i].x == agents[j].x and agents[i].y == agents[j].y:
 				crash += 1
-	round == 1
 	return crash

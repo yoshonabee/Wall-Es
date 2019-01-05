@@ -33,7 +33,7 @@ def testManualGameImageOutput2():
     game.printConsoleMap()   
     round = 1
     while(game.algNext(crash, round)):
-        pass
+        round += 1
         
 testManualGameImageOutput2()
 
