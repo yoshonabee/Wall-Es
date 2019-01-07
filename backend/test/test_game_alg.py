@@ -15,7 +15,7 @@ def testManualGameImageOutput2():
     
     game = Game(height, width)
 
-    game.setRandomMap(0, 300, 50) # numbers of agents, targets, obstacles
+    game.setRandomMap(0, 300, 100) # numbers of agents, targets, obstacles
 
 
     game.printGodMap()

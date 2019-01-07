@@ -57,7 +57,7 @@ def no_target_walk(area, agent):
 						target[2] += 1
 					if area[i][j] > 0 and area[i][j] != agent.id:
 						direction[2] -= 20
-						target[2] -= 20
+						#target[2] -= 20
 				if j >= agent.x:
 					if area[i][j] == -3:
 						direction[1] += 1
@@ -65,7 +65,7 @@ def no_target_walk(area, agent):
 						target[1] += 1
 					if area[i][j] > 0 and area[i][j] != agent.id:
 						direction[1] -= 20
-						target[1] -= 20
+						#target[1] -= 20
 			if i >= agent.y:
 				if j >= 0 and j <= agent.x:
 					if area[i][j] == -3:
@@ -74,7 +74,7 @@ def no_target_walk(area, agent):
 						target[3] += 1
 					if area[i][j] > 0 and area[i][j] != agent.id:
 						direction[3] -= 20
-						target[3] -= 20
+						#target[3] -= 20
 				if j >= agent.x:
 					if area[i][j] == -3:
 						direction[4] += 1
@@ -82,7 +82,7 @@ def no_target_walk(area, agent):
 						target[4] += 1
 					if area[i][j] > 0 and area[i][j] != agent.id:
 						direction[4] -= 20
-						target[4] -= 20
+						#target[4] -= 20
 	ind = -1    
 	maximum = 0
 	if np.sum(direction) != 0:
@@ -104,7 +104,7 @@ def no_target_walk(area, agent):
 					ind = k
 			
 		
-	else:
+	elif np.sum(direction) % 20 == 0:
 		maximum = 0
 		ind == -1
 		if target[1] == target[2] and target[1] * target[2] != 0:
