@@ -15,11 +15,11 @@ def testManualGameImageOutput2():
     
     game = Game(height, width)
 
-    game.setRandomMap(2, 300, 150) # numbers of agents, targets, obstacles
+    game.setRandomMap(8, 300, 0) # numbers of agents, targets, obstacles
 
 
     game.printGodMap()
-    agents = game.godmap.agents
+    #agents = game.godmap.agents
     '''agents = {
         0: Agent(0, 0, 0, height, width, r=5), # id, x, y, height, width
         1: Agent(1, width-1 , 0, height, width, r=5), # id, x, y, height, width

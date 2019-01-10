@@ -85,7 +85,8 @@ def no_target_walk(area, agent):
 						#target[4] -= 20
 	ind = -1    
 	maximum = 0
-	if np.sum(direction) != 0:
+	if np.sum(direction) % 20 != 0 : 
+		print('direction')
 		if direction[1] == direction[2] and direction[1] * direction[2] != 0:
 			ind = 6
 		elif direction[2] == direction[3] and direction[2] * direction[3] != 0:
@@ -105,6 +106,7 @@ def no_target_walk(area, agent):
 			
 		
 	elif np.sum(direction) % 20 == 0:
+		print('target')
 		maximum = 0
 		ind == -1
 		if target[1] == target[2] and target[1] * target[2] != 0:
@@ -191,6 +193,47 @@ def avoid_obstacles(agent, area, x, y): #有出界的bug
 					ind = np.abs(n_ind % 8)
 				else:
 					ind = n_ind
+	else:
+		for i in range(1, 5):
+			n_ind = ind - i
+			if n_ind <= 0:
+				fix_ind = np.abs((n_ind - 1) % 9)
+				try_x = agent.x + command[fix_ind]["dx"]
+				try_y = agent.y + command[fix_ind]["dy"]
+			else:
+				try_x = agent.x + command[n_ind]["dx"]
+				try_y = agent.y + command[n_ind]["dy"] 
+			if (try_x >= 0 and try_x < agent.width) and (try_y >= 0 and try_y < agent.height):
+				if not (area[try_y][try_x] == -1 or area[try_y][try_x] > 0):
+					indlist.append(n_ind)    
+		for i in range(1, 5):
+			n_ind = ind + i
+			if n_ind > 8:
+				fix_ind = np.abs(n_ind % 8)
+				try_x = agent.x + command[fix_ind]["dx"]
+				try_y = agent.y + command[fix_ind]["dy"]
+			else:
+				try_x = agent.x + command[n_ind]["dx"]
+				try_y = agent.y + command[n_ind]["dy"] 
+			if (try_x >= 0 and try_x < agent.width) and (try_y >= 0 and try_y < agent.height):
+				if not (area[try_y][try_x] == -1 or area[try_y][try_x] > 0):
+					indlist.append(n_ind)    
+		print(indlist)
+		if len(indlist) == 0:
+			ind = 0
+		else:
+			min = 8
+			for i in range(0, len(indlist)):
+				if np.abs(ind - indlist[i]) < min:
+					min = np.abs(ind - indlist[i])
+					n_ind = indlist[i]
+			if n_ind <= 0:
+				ind = np.abs((n_ind - 1) % 9)
+			elif n_ind > 8:
+				ind = np.abs(n_ind % 8)
+			else:
+				ind = n_ind
+				
 	print(ind)
 	return (command[ind]["dx"], command[ind]["dy"])
 
@@ -216,7 +259,7 @@ def in_mission_field(agents, belongs, game): # pick up the target that is in the
 	for i in agents:
 		if belongs[i] == None:
 			null += 1
-	if null == 3:
+	if null == len(agents):
 		return False
 	else:
 		if mf == belongs and not haveunseenspace(game.consolemap.areas, agents[0].height, agents[0].width):
