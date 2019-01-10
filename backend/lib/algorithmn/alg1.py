@@ -204,7 +204,9 @@ def haveunseenspace(area, height, width):
 	return False
 
 def in_mission_field(agents, belongs, game): # pick up the target that is in their belonging
-	mf = {0: [], 1: [], 2: []}
+	mf = {}
+	for i in agents:
+		mf[i] = []
 	for i in agents:
 		for target in belongs[i]:
 			if target_agent_len(target, agents[i]) < agents[i].radius * 1.5:
@@ -237,10 +239,12 @@ def alg_next(round, game, agents, crash): # one round
 		
 	for item in found_target: # cluster the target
 		index = 0
-		if target_agent_len(item,agents[index])>target_agent_len(item,agents[1]):
-			index = 1
-		if target_agent_len(item,agents[index])>target_agent_len(item,agents[2]):
-			index = 2
+		min = 100000
+		for id in agents:
+			if target_agent_len(item, agents[id]) < min:
+				min = target_agent_len(item, agents[id])
+				index = id
+
 		belongs[index].append(item)
 		
 	#belongs = target_belong(found_target, agents)

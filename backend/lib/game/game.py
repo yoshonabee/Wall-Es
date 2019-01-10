@@ -51,18 +51,23 @@ class Game():
         self.godmap.setRandomTargets(targets_number)
         self.agents_number = agents_number
         self.targets_number = targets_number
+        height = self.height
+        width = self.width
+        agents_dict = {
+        0: Agent(0, 0, 0, height, width, r=5), # id, x, y, height, width
+        1: Agent(1, width-1 , height-1, height, width, r=5), # id, x, y, height, width
+        2: Agent(2, width-1,0, height, width, r = 5), # id, x, y, height, width
+        3: Agent(3, 0 , height-1 , height, width, r=5),
+        4: Agent(4, 0 , np.int(height/2) , height, width, r=5),
+        5: Agent(5, width-1 , np.int(height/2) , height, width, r=5),
+        6: Agent(6, np.int(width/2) , 0 , height, width, r=5),    
+        7: Agent(7, np.int(width/2) , height-1 , height, width, r=5),
+        }
         agents = {}
-        xy_temp = []
+        
         for id in range(0, agents_number):
-            x = random.randint(0, self.width - 1)
-            y = random.randint(0, self.height - 1)
-            while (x, y) in xy_temp:
-                x = random.randint(0, self.width - 1)
-                y = random.randint(0, self.height - 1)
-
-            xy_temp.append((x, y))
-            agent = Agent(id, y, x, self.height, self.width)
-            agents[id] = agent
+            
+            agents[id] = agents_dict[id]
         self.setAgents(agents)
 
     def runOneRound(self, commands):
