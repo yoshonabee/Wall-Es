@@ -9,13 +9,13 @@ from lib.game.agent import Agent
 
 def testManualGameImageOutput2():
     print("\n== init manual setting game ==")
-    height = 40
-    width = 40
+    height = 50
+    width = 50
     crash = 0
     
     game = Game(height, width)
 
-    game.setRandomMap(8, 300, 0) # numbers of agents, targets, obstacles
+    game.setRandomMap(8, 300, 200) # numbers of agents, targets, obstacles
 
 
     game.printGodMap()
